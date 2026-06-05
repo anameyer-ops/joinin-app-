@@ -1,1 +1,1634 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JoinIn · People Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --ab:#054159;--ab2:#07587a;--ab3:#032b3a;--abl:#e6f2f7;
+  --tl:#04BFAD;--tlm:#038C8C;--tll:#e0f7f5;
+  --mn:#91D9A3;--mnl:#edf9f0;--mnm:#4aad6a;
+  --wn:#F5A623;--wnl:#fff8ec;--wnm:#c77d08;
+  --dg:#E85C4A;--dgl:#fef0ee;--dgm:#c44030;
+  --pp:#7F77DD;--ppl:#eeedfe;--ppm:#534AB7;
+  --tx:#0d2f3f;--txm:#3e6070;--txf:#7fa4b4;--txx:#c8dde6;
+  --br:rgba(5,65,89,.10);--brs:rgba(5,65,89,.17);
+  --sf:#fff;--sf2:#f4fafb;--sf3:#e8f4f6;
+  --r:13px;--rs:8px;
+  --sh:0 1px 3px rgba(5,65,89,.07),0 4px 14px rgba(5,65,89,.05);
+  --shl:0 4px 20px rgba(5,65,89,.11),0 12px 36px rgba(5,65,89,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;color:var(--tx);background:#ecf5f8;}
+
+/* ── AUTH ── */
+#authWrap{display:flex;height:100vh;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--ab3) 0%,#0a3d50 60%,#0e556e 100%);position:relative;overflow:hidden;}
+#authWrap::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:rgba(4,191,173,.07);top:-200px;right:-100px;pointer-events:none;}
+#authWrap::after{content:'';position:absolute;width:400px;height:400px;border-radius:50%;background:rgba(4,191,173,.05);bottom:-150px;left:-50px;pointer-events:none;}
+.auth-box{background:rgba(255,255,255,.04);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.1);border-radius:20px;padding:2.5rem;width:420px;max-width:94vw;position:relative;z-index:1;}
+.auth-logo{display:flex;align-items:center;gap:10px;margin-bottom:2rem;}
+.auth-lm{width:36px;height:36px;background:var(--tl);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.auth-lw{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.02em;}
+.auth-lw span{color:var(--tl);}
+.auth-lsub{font-size:10px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.3);letter-spacing:.1em;text-transform:uppercase;margin-top:1px;}
+.auth-title{font-size:22px;font-weight:600;color:#fff;margin-bottom:.35rem;}
+.auth-sub{font-size:13px;color:rgba(255,255,255,.45);margin-bottom:1.75rem;line-height:1.5;}
+.auth-tabs{display:flex;gap:3px;background:rgba(255,255,255,.06);border-radius:10px;padding:3px;margin-bottom:1.75rem;}
+.auth-tab{flex:1;padding:8px;text-align:center;border-radius:8px;font-size:13px;cursor:pointer;color:rgba(255,255,255,.45);font-weight:500;transition:all .2s;}
+.auth-tab.on{background:rgba(255,255,255,.12);color:#fff;}
+.auth-fg{display:flex;flex-direction:column;gap:.75rem;}
+.auth-fl{font-size:10.5px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.auth-in{width:100%;font-size:13.5px;font-family:'DM Sans',sans-serif;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 13px;color:#fff;outline:none;transition:border-color .2s;}
+.auth-in::placeholder{color:rgba(255,255,255,.25);}
+.auth-in:focus{border-color:var(--tl);box-shadow:0 0 0 3px rgba(4,191,173,.15);}
+.auth-btn{width:100%;padding:11px;border-radius:10px;border:none;background:var(--tl);color:#fff;font-size:13.5px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .2s;margin-top:.25rem;display:flex;align-items:center;justify-content:center;gap:7px;}
+.auth-btn:hover{background:var(--tlm);}
+.auth-btn:disabled{opacity:.6;cursor:not-allowed;}
+.auth-err{background:rgba(232,92,74,.15);border:1px solid rgba(232,92,74,.3);border-radius:8px;padding:.65rem .9rem;font-size:12px;color:#ffb3ab;display:none;}
+.auth-err.on{display:block;}
+.auth-ok{background:rgba(145,217,163,.15);border:1px solid rgba(145,217,163,.3);border-radius:8px;padding:.65rem .9rem;font-size:12px;color:#a3e8b0;display:none;}
+.auth-ok.on{display:block;}
+.auth-footer{text-align:center;margin-top:1.5rem;font-size:11.5px;color:rgba(255,255,255,.25);}
+
+/* ── APP ── */
+#appWrap{display:none;height:100vh;overflow:hidden;flex-direction:row;}
+#appWrap.on{display:flex;}
+.side{width:220px;height:100%;background:var(--ab3);display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;}
+.body{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.top{height:52px;background:var(--sf);border-bottom:.5px solid var(--brs);display:flex;align-items:center;padding:0 1.5rem;justify-content:space-between;flex-shrink:0;}
+.content{flex:1;overflow-y:auto;padding:1.5rem;}
+
+/* SIDEBAR */
+.slogo{padding:1.25rem 1.1rem .9rem;border-bottom:1px solid rgba(255,255,255,.06);}
+.slogo-r{display:flex;align-items:center;gap:8px;}
+.slogo-m{width:28px;height:28px;background:var(--tl);border-radius:7px;display:flex;align-items:center;justify-content:center;}
+.slogo-w{font-size:15px;font-weight:600;color:#fff;letter-spacing:-.01em;}
+.slogo-w span{color:var(--tl);}
+.slogo-s{font-size:8.5px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.28);letter-spacing:.1em;text-transform:uppercase;margin-top:2px;padding-left:36px;}
+.snl{font-size:8.5px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.22);letter-spacing:.1em;text-transform:uppercase;padding:.65rem 1.1rem .25rem;margin-top:.15rem;}
+.ni{display:flex;align-items:center;gap:8px;padding:.5rem 1.1rem;cursor:pointer;color:rgba(255,255,255,.45);font-size:12.5px;transition:all .15s;position:relative;}
+.ni:hover{background:rgba(4,191,173,.07);color:rgba(255,255,255,.75);}
+.ni.on{background:rgba(4,191,173,.11);color:#fff;font-weight:500;}
+.ni.on::before{content:'';position:absolute;left:0;top:5px;bottom:5px;width:2px;background:var(--tl);border-radius:0 2px 2px 0;}
+.ni-ic{font-size:13px;width:16px;text-align:center;flex-shrink:0;}
+.ni-bd{margin-left:auto;background:var(--dg);color:#fff;font-size:8.5px;font-family:'DM Mono',monospace;padding:1px 5px;border-radius:99px;}
+.sfoot{margin-top:auto;padding:.9rem 1.1rem;border-top:1px solid rgba(255,255,255,.06);}
+.sfu{display:flex;align-items:center;gap:8px;}
+.sfav{width:28px;height:28px;background:linear-gradient(135deg,var(--tl),var(--ppm));border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;}
+.sfn{font-size:11.5px;color:rgba(255,255,255,.65);font-weight:500;line-height:1.3;}
+.sfr{font-size:9.5px;color:rgba(255,255,255,.28);font-family:'DM Mono',monospace;}
+.sfl-btn{width:100%;margin-top:.75rem;padding:7px;border-radius:7px;background:rgba(232,92,74,.12);border:1px solid rgba(232,92,74,.25);color:rgba(232,92,74,.8);font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;text-align:center;}
+.sfl-btn:hover{background:rgba(232,92,74,.2);}
+
+/* TOPBAR */
+.ttl{font-size:14px;font-weight:600;color:var(--ab);}
+.tsub{font-size:11px;color:var(--txf);}
+.tbr{display:flex;align-items:center;gap:7px;}
+.btn{padding:6px 13px;border-radius:var(--rs);border:.5px solid var(--brs);background:var(--sf);font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .15s;color:var(--txm);display:inline-flex;align-items:center;gap:5px;}
+.btn:hover{background:var(--sf2);}
+.btn.pr{background:var(--ab);color:#fff;border-color:var(--ab);}
+.btn.pr:hover{background:var(--ab2);}
+.btn.tl{background:var(--tl);color:#fff;border-color:var(--tl);}
+.btn.tl:hover{background:var(--tlm);}
+.btn.sm{padding:5px 10px;font-size:11px;}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+
+/* PAGES */
+.pg{display:none;}
+.pg.on{display:block;animation:fup .22s ease;}
+@keyframes fup{from{opacity:0;transform:translateY(5px);}to{opacity:1;transform:translateY(0);}}
+
+/* GRIDS */
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;margin-bottom:1rem;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:.85rem;margin-bottom:1rem;}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:.85rem;margin-bottom:1rem;}
+.g21{display:grid;grid-template-columns:2fr 1fr;gap:.85rem;margin-bottom:1rem;}
+
+/* CARD */
+.card{background:var(--sf);border:.5px solid var(--brs);border-radius:var(--r);padding:1.1rem;box-shadow:var(--sh);}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem;}
+.ct{font-size:12.5px;font-weight:600;color:var(--ab);display:flex;align-items:center;gap:6px;}
+.ci{width:22px;height:22px;border-radius:5px;background:var(--tll);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;}
+
+/* KPI */
+.kpi{background:var(--sf);border:.5px solid var(--brs);border-radius:var(--r);padding:1rem 1.1rem;box-shadow:var(--sh);cursor:default;transition:transform .15s,box-shadow .15s;}
+.kpi:hover{transform:translateY(-1px);box-shadow:var(--shl);}
+.kl{font-size:9.5px;font-family:'DM Mono',monospace;color:var(--txf);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;}
+.kv{font-size:26px;font-weight:700;color:var(--ab);letter-spacing:-.02em;line-height:1;}
+.kv.tl{color:var(--tlm);}.kv.mn{color:var(--mnm);}.kv.wn{color:var(--wnm);}.kv.dg{color:var(--dgm);}.kv.pp{color:var(--ppm);}
+.ks{font-size:10.5px;color:var(--txf);margin-top:5px;}
+.kt{font-size:9.5px;font-family:'DM Mono',monospace;padding:2px 6px;border-radius:99px;}
+.ku{background:var(--mnl);color:var(--mnm);}.kd{background:var(--dgl);color:var(--dgm);}.kn{background:var(--sf2);color:var(--txf);}
+
+/* BADGES */
+.bd{font-size:9.5px;font-family:'DM Mono',monospace;font-weight:500;padding:2px 7px;border-radius:99px;display:inline-flex;align-items:center;gap:3px;}
+.bd-tl{background:var(--tll);color:var(--tlm);}
+.bd-ab{background:var(--abl);color:var(--ab);}
+.bd-mn{background:var(--mnl);color:var(--mnm);}
+.bd-wn{background:var(--wnl);color:var(--wnm);}
+.bd-dg{background:var(--dgl);color:var(--dgm);}
+.bd-pp{background:var(--ppl);color:var(--ppm);}
+
+/* RISK */
+.rp{font-size:9.5px;font-family:'DM Mono',monospace;padding:2px 8px;border-radius:99px;font-weight:500;}
+.rl{background:#edf9f0;color:#2a7a40;}.rm{background:#fff8ec;color:#a06800;}.rh{background:#fef0ee;color:#b03020;}
+
+/* SCORE BAR */
+.si{margin-bottom:8px;}.si:last-child{margin-bottom:0;}
+.stp{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;}
+.sn{font-size:11.5px;color:var(--txm);font-weight:500;}
+.sv{font-size:10.5px;font-family:'DM Mono',monospace;font-weight:600;color:var(--ab);}
+.sb{height:4px;background:var(--sf3);border-radius:99px;overflow:hidden;}
+.sf_{height:100%;border-radius:99px;transition:width .6s ease;}
+
+/* TABLE */
+.tw{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;}
+th{font-size:9.5px;font-family:'DM Mono',monospace;font-weight:500;color:var(--txf);text-transform:uppercase;letter-spacing:.05em;padding:7px 11px;text-align:left;border-bottom:.5px solid var(--brs);}
+td{font-size:12px;color:var(--tx);padding:9px 11px;border-bottom:.5px solid var(--br);}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:var(--sf2);cursor:pointer;}
+.pc{display:flex;align-items:center;gap:8px;}
+.pav{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:700;color:#fff;flex-shrink:0;}
+.pn{font-size:12px;font-weight:500;color:var(--ab);}
+.pr_{font-size:10px;color:var(--txf);}
+
+/* NPS */
+.npsd{text-align:center;padding:.75rem 0;}
+.npsv{font-size:46px;font-weight:700;letter-spacing:-.03em;line-height:1;}
+.npsl{font-size:9.5px;font-family:'DM Mono',monospace;color:var(--txf);text-transform:uppercase;letter-spacing:.06em;margin-top:3px;}
+.npsb{height:6px;border-radius:99px;background:var(--sf3);overflow:hidden;margin:10px 0 6px;}
+.nbf{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--dg),var(--wn),var(--mn));}
+.nss{display:flex;justify-content:space-between;font-size:9.5px;font-family:'DM Mono',monospace;color:var(--txf);}
+
+/* ALERT */
+.al{display:flex;align-items:flex-start;gap:9px;padding:.65rem .85rem;border-radius:var(--rs);margin-bottom:.4rem;border:.5px solid;}
+.al.ah{background:var(--dgl);border-color:rgba(232,92,74,.2);}
+.al.am{background:var(--wnl);border-color:rgba(245,166,35,.2);}
+.al.ao{background:var(--mnl);border-color:rgba(145,217,163,.3);}
+.aic{font-size:15px;flex-shrink:0;margin-top:1px;}
+.atl{font-size:11.5px;font-weight:600;color:var(--ab);margin-bottom:1px;}
+.ads{font-size:10.5px;color:var(--txm);line-height:1.5;}
+.atm{font-size:9.5px;font-family:'DM Mono',monospace;color:var(--txf);margin-top:2px;}
+
+/* RANK */
+.ri{display:flex;align-items:center;gap:9px;padding:.5rem .65rem;border-radius:var(--rs);margin-bottom:.3rem;background:var(--sf2);border:.5px solid var(--br);}
+.rn{font-size:10.5px;font-family:'DM Mono',monospace;font-weight:700;color:var(--txf);width:16px;text-align:right;flex-shrink:0;}
+.rn.gd{color:#C9A84C;}
+.rnm{font-size:11.5px;font-weight:500;color:var(--ab);flex:1;}
+.rsc{font-size:11.5px;font-family:'DM Mono',monospace;font-weight:600;color:var(--tlm);}
+
+/* SEARCH */
+.fb{display:flex;align-items:center;gap:7px;margin-bottom:1rem;flex-wrap:wrap;}
+.fi{font-size:12px;font-family:'DM Sans',sans-serif;background:var(--sf);border:.5px solid var(--brs);border-radius:var(--rs);padding:6px 10px;color:var(--txm);outline:none;cursor:pointer;}
+.fi:focus{border-color:var(--tl);}
+.si__{font-size:12px;font-family:'DM Sans',sans-serif;background:var(--sf);border:.5px solid var(--brs);border-radius:var(--rs);padding:6px 10px;color:var(--tx);outline:none;flex:1;min-width:160px;}
+.si__:focus{border-color:var(--tl);}
+
+/* SECTION HDR */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;}
+.sht{font-size:13px;font-weight:600;color:var(--ab);}
+
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(3,28,38,.55);backdrop-filter:blur(4px);z-index:300;display:none;align-items:flex-start;justify-content:center;padding-top:5vh;overflow-y:auto;}
+.ov.op{display:flex;}
+.mo{background:var(--sf);border-radius:var(--r);padding:1.5rem;width:560px;max-width:94vw;margin-bottom:3rem;box-shadow:var(--shl);animation:slideUp .2s ease;}
+.mo.wide{width:720px;}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;}
+.mt{font-size:14.5px;font-weight:600;color:var(--ab);}
+.mx{cursor:pointer;color:var(--txf);font-size:17px;line-height:1;padding:3px;border-radius:4px;}
+.mx:hover{background:var(--sf2);color:var(--txm);}
+
+/* FORM */
+.fg{display:flex;flex-direction:column;gap:.75rem;}
+.fl{display:grid;grid-template-columns:1fr 1fr;gap:.75rem;}
+.fld{display:flex;flex-direction:column;gap:4px;}
+.flb{font-size:10px;font-family:'DM Mono',monospace;color:var(--txf);text-transform:uppercase;letter-spacing:.06em;}
+.flb .req{color:var(--dg);}
+input[type=text],input[type=email],input[type=date],input[type=number],select,textarea{width:100%;font-size:12.5px;font-family:'DM Sans',sans-serif;background:var(--sf2);border:.5px solid var(--br);border-radius:var(--rs);padding:7px 10px;color:var(--tx);outline:none;transition:border-color .15s;}
+input:focus,select:focus,textarea:focus{border-color:var(--tl);box-shadow:0 0 0 2px rgba(4,191,173,.1);}
+textarea{resize:vertical;min-height:70px;line-height:1.5;}
+.frow{display:flex;justify-content:flex-end;gap:7px;margin-top:1.25rem;padding-top:1rem;border-top:.5px solid var(--br);}
+
+/* CHECKIN STEPS */
+.stps{display:flex;gap:3px;margin-bottom:1.25rem;overflow-x:auto;padding-bottom:2px;}
+.stp_{padding:5px 12px;border-radius:6px;font-size:11.5px;cursor:pointer;color:var(--txf);font-weight:500;white-space:nowrap;border:.5px solid transparent;transition:all .15s;}
+.stp_.on{background:var(--sf);color:var(--ab);border-color:var(--brs);box-shadow:0 1px 3px rgba(5,65,89,.08);}
+.stp_.dn{color:var(--mnm);}
+.stp_.dn::before{content:'✓ ';}
+
+/* THERMO */
+.th-item{margin-bottom:10px;}.th-item:last-child{margin-bottom:0;}
+.th-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:1px;}
+.th-n{font-size:12px;font-weight:500;color:var(--tx);}
+.th-v{font-size:11px;font-family:'DM Mono',monospace;font-weight:600;color:var(--ab);}
+.th-d{font-size:10.5px;color:var(--txf);margin-bottom:5px;}
+.th-tr{display:flex;align-items:center;gap:6px;}
+.th-tk{font-size:9.5px;font-family:'DM Mono',monospace;color:var(--txf);min-width:12px;}
+.th-track{flex:1;height:7px;background:var(--sf3);border-radius:99px;position:relative;cursor:pointer;border:.5px solid var(--br);}
+.th-fill{height:100%;border-radius:99px;pointer-events:none;transition:width .1s;}
+.divs{height:.5px;background:var(--br);margin:12px 0;}
+
+/* EMOJI */
+.em-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px;}
+.em-btn{font-size:20px;cursor:pointer;opacity:.3;transition:all .18s;border:none;background:none;padding:3px;border-radius:7px;}
+.em-btn.on{opacity:1;transform:scale(1.15);background:var(--sf3);}
+.em-btn:hover{opacity:.7;}
+
+/* SCALE */
+.sc-row{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;}
+.sc-btn{flex:1;min-width:28px;padding:6px 3px;border:.5px solid var(--br);border-radius:var(--rs);background:var(--sf2);font-size:11px;font-family:'DM Mono',monospace;cursor:pointer;transition:all .18s;text-align:center;color:var(--txm);}
+.sc-btn:hover{border-color:var(--tlm);color:var(--tlm);}
+.sc-btn.on{background:var(--ab);color:#fff;border-color:var(--ab);}
+.sc-lbs{display:flex;justify-content:space-between;font-size:9.5px;color:var(--txf);margin-top:3px;}
+
+/* TAGS */
+.tg-row{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px;}
+.tg{font-size:10.5px;background:var(--sf2);border:.5px solid var(--brs);border-radius:99px;padding:3px 10px;cursor:pointer;transition:all .18s;color:var(--txm);}
+.tg:hover,.tg.on{background:var(--tll);border-color:var(--tlm);color:var(--tlm);}
+
+/* Q label */
+.ql{font-size:12px;font-weight:500;color:var(--tx);margin-bottom:5px;line-height:1.5;}
+
+/* COLLAB DETAIL */
+.cd-hd{background:linear-gradient(135deg,var(--ab3),#0a3d50);border-radius:var(--r);padding:1.25rem;margin-bottom:1rem;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.cd-av{width:44px;height:44px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;}
+.cd-nm{font-size:15px;font-weight:600;color:#fff;}
+.cd-rl{font-size:11px;color:rgba(4,191,173,.8);font-family:'DM Mono',monospace;}
+.cd-mt{margin-left:auto;display:flex;gap:14px;}
+.cd-mvv{font-size:20px;font-weight:700;color:#fff;text-align:right;}
+.cd-mvl{font-size:8.5px;font-family:'DM Mono',monospace;color:rgba(255,255,255,.3);}
+
+/* EXPORT */
+.exp-opt{display:flex;align-items:center;gap:11px;padding:.9rem;border:.5px solid var(--brs);border-radius:var(--r);background:var(--sf);cursor:pointer;transition:all .15s;margin-bottom:.5rem;}
+.exp-opt:hover{background:var(--sf2);border-color:var(--tlm);}
+.exp-ic{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.exp-nm{font-size:12.5px;font-weight:600;color:var(--ab);}
+.exp-ds{font-size:10.5px;color:var(--txf);}
+.exp-ar{margin-left:auto;color:var(--txf);font-size:14px;}
+
+/* EMPTY */
+.empty{text-align:center;padding:3rem 1rem;color:var(--txf);}
+.empty-ic{font-size:28px;margin-bottom:.65rem;}
+.empty-tx{font-size:12.5px;}
+
+/* LOADING */
+.loading{display:flex;align-items:center;justify-content:center;padding:3rem;gap:10px;color:var(--txf);font-size:13px;}
+.spin{width:18px;height:18px;border:2px solid var(--br);border-top-color:var(--tl);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* TOAST */
+.toast-wrap{position:fixed;bottom:1.5rem;right:1.5rem;z-index:999;display:flex;flex-direction:column;gap:6px;}
+.toast{background:var(--ab);color:#fff;padding:.65rem 1rem;border-radius:var(--rs);font-size:12px;box-shadow:var(--shl);animation:tin .25s ease;display:flex;align-items:center;gap:7px;}
+.toast.ok{background:#1a7a40;}.toast.er{background:var(--dgm);}
+@keyframes tin{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+canvas{max-height:200px!important;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════
+     AUTH
+══════════════════════════════════════════════════════ -->
+<div id="authWrap">
+  <div class="auth-box">
+    <div class="auth-logo">
+      <div class="auth-lm">
+        <svg viewBox="0 0 18 18" fill="none" width="18" height="18"><circle cx="9" cy="9" r="7" stroke="white" stroke-width="1.5"/><path d="M6 9l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="auth-lw">Join<span>In</span></div>
+        <div class="auth-lsub">People Intelligence</div>
+      </div>
+    </div>
+
+    <div class="auth-tabs">
+      <div class="auth-tab on" onclick="authTab('login')">Entrar</div>
+      <div class="auth-tab" onclick="authTab('register')">Criar conta</div>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="loginForm" class="auth-fg">
+      <div class="auth-err" id="loginErr"></div>
+      <div class="auth-ok"  id="loginOk"></div>
+      <div>
+        <div class="auth-fl">E-mail</div>
+        <input class="auth-in" type="email" id="loginEmail" placeholder="seu@email.com" autocomplete="email">
+      </div>
+      <div>
+        <div class="auth-fl">Senha</div>
+        <input class="auth-in" type="password" id="loginPass" placeholder="••••••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="auth-btn" id="loginBtn" onclick="doLogin()">
+        <span>Entrar na plataforma</span>
+      </button>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="registerForm" class="auth-fg" style="display:none">
+      <div class="auth-err" id="regErr"></div>
+      <div class="auth-ok"  id="regOk"></div>
+      <div>
+        <div class="auth-fl">Nome completo</div>
+        <input class="auth-in" type="text" id="regName" placeholder="Seu nome">
+      </div>
+      <div>
+        <div class="auth-fl">E-mail corporativo</div>
+        <input class="auth-in" type="email" id="regEmail" placeholder="seu@joinin.com.br" autocomplete="email">
+      </div>
+      <div>
+        <div class="auth-fl">Senha (mín. 8 caracteres)</div>
+        <input class="auth-in" type="password" id="regPass" placeholder="••••••••" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()">
+      </div>
+      <div>
+        <div class="auth-fl">Confirmar senha</div>
+        <input class="auth-in" type="password" id="regPass2" placeholder="••••••••" onkeydown="if(event.key==='Enter')doRegister()">
+      </div>
+      <button class="auth-btn" id="regBtn" onclick="doRegister()">
+        <span>Criar conta</span>
+      </button>
+    </div>
+
+    <div class="auth-footer">© 2026 JoinIn Tecnologia · LGPD compliant</div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     APP
+══════════════════════════════════════════════════════ -->
+<div id="appWrap">
+  <aside class="side">
+    <div class="slogo">
+      <div class="slogo-r">
+        <div class="slogo-m"><svg viewBox="0 0 18 18" fill="none" width="15" height="15"><circle cx="9" cy="9" r="7" stroke="white" stroke-width="1.5"/><path d="M6 9l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <span class="slogo-w">Join<span>In</span></span>
+      </div>
+      <div class="slogo-s">People Intelligence</div>
+    </div>
+    <div class="snl">Gestão</div>
+    <div class="ni on" data-page="colaboradores" onclick="nav(this)"><span class="ni-ic">👥</span> Colaboradores</div>
+    <div class="ni" data-page="historico" onclick="nav(this)"><span class="ni-ic">📁</span> Histórico</div>
+    <div class="snl">Analytics</div>
+    <div class="ni" data-page="dashboard" onclick="nav(this)"><span class="ni-ic">⊞</span> Dashboard RH</div>
+    <div class="ni" data-page="nr1" onclick="nav(this)"><span class="ni-ic">🛡️</span> NR-1 <span class="ni-bd" id="alertBadge" style="display:none">!</span></div>
+    <div class="snl">Dados</div>
+    <div class="ni" data-page="exportar" onclick="nav(this)"><span class="ni-ic">↗</span> Exportações</div>
+    <div class="sfoot">
+      <div class="sfu">
+        <div class="sfav" id="sideAvatar">?</div>
+        <div>
+          <div class="sfn" id="sideName">—</div>
+          <div class="sfr" id="sideRole">Analista RH</div>
+        </div>
+      </div>
+      <button class="sfl-btn" onclick="doLogout()">↩ Sair</button>
+    </div>
+  </aside>
+
+  <div class="body">
+    <div class="top">
+      <div>
+        <div class="ttl" id="topTitle">Colaboradores</div>
+        <div class="tsub">JoinIn Tecnologia · <span id="topDate"></span></div>
+      </div>
+      <div class="tbr" id="topActions"></div>
+    </div>
+    <div class="content">
+
+      <!-- COLABORADORES -->
+      <div class="pg on" id="pg-colaboradores">
+        <div class="fb">
+          <input type="text" class="si__" placeholder="🔍 Buscar colaborador..." oninput="filterCollabs(this.value)" id="searchCollab">
+          <select class="fi" onchange="filterCollabs()" id="fArea"><option value="">Todas as áreas</option></select>
+          <select class="fi" onchange="filterCollabs()" id="fGestor"><option value="">Todos os gestores</option></select>
+          <select class="fi" onchange="filterCollabs()" id="fStatus"><option value="">Todos</option><option value="ativo">Ativos</option><option value="desligado">Desligados</option></select>
+        </div>
+        <div class="card">
+          <div class="tw"><table id="collabTable">
+            <thead><tr>
+              <th>Colaborador</th><th>Área</th><th>Gestor</th><th>Admissão</th><th>Dias</th>
+              <th>Checkins</th><th>Último Score</th><th>Último NPS</th><th>Status</th><th></th>
+            </tr></thead>
+            <tbody id="collabBody"><tr><td colspan="10"><div class="loading"><div class="spin"></div>Carregando...</div></td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- HISTÓRICO -->
+      <div class="pg" id="pg-historico">
+        <div class="fb">
+          <input type="text" class="si__" placeholder="🔍 Buscar..." oninput="filterHistory(this.value)" id="searchHist">
+          <select class="fi" onchange="filterHistory()" id="hArea"><option value="">Todas as áreas</option></select>
+          <select class="fi" id="hPeriod" onchange="filterHistory()">
+            <option value="">Todos os períodos</option>
+            <option value="30">Últimos 30 dias</option>
+            <option value="90">Últimos 90 dias</option>
+            <option value="180">Últimos 180 dias</option>
+          </select>
+        </div>
+        <div class="card">
+          <div class="tw"><table>
+            <thead><tr>
+              <th>Colaborador</th><th>Área</th><th>Gestor</th><th>Data</th>
+              <th>Score</th><th>NPS</th><th>Bem-estar</th><th>Liderança</th><th>Risco NR-1</th><th></th>
+            </tr></thead>
+            <tbody id="histBody"><tr><td colspan="10"><div class="loading"><div class="spin"></div>Carregando...</div></td></tr></tbody>
+          </table></div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD RH -->
+      <div class="pg" id="pg-dashboard">
+        <div class="g4">
+          <div class="kpi"><div class="kl">📋 Checkins Realizados</div><div class="kv tl" id="dCheckins">—</div><div class="ks" id="dCheckinsSub"></div></div>
+          <div class="kpi"><div class="kl">✅ Colaboradores Ativos</div><div class="kv mn" id="dAtivos">—</div><div class="ks" id="dAtivosSub"></div></div>
+          <div class="kpi"><div class="kl">📊 NPS de Onboarding</div><div class="kv" id="dNPS" style="color:var(--mnm)">—</div><div class="ks"><span class="kt kn" id="dNPSCat"></span></div></div>
+          <div class="kpi"><div class="kl">🌡️ Score Médio Geral</div><div class="kv pp" id="dScore">—</div><div class="ks" id="dScoreSub"></div></div>
+        </div>
+        <div class="g4">
+          <div class="kpi"><div class="kl">⏱ Retenção 45d</div><div class="kv tl" id="dRet45">—</div><div class="ks" id="dRet45s"></div></div>
+          <div class="kpi"><div class="kl">📅 Retenção 90d</div><div class="kv" id="dRet90">—</div><div class="ks" id="dRet90s"></div></div>
+          <div class="kpi"><div class="kl">❤️ Bem-estar Médio</div><div class="kv wn" id="dBem">—</div><div class="ks" id="dBemSub"></div></div>
+          <div class="kpi"><div class="kl">🛡️ Riscos Altos NR-1</div><div class="kv dg" id="dRiscos">0</div><div class="ks" id="dRiscosSub"></div></div>
+        </div>
+        <div class="g21">
+          <div class="card">
+            <div class="ch"><div class="ct"><div class="ci">🌡️</div>Scores de Experiência</div><span class="bd bd-ab" id="scoreBase">0 respostas</span></div>
+            <div id="scoresBlock"><div class="empty" style="padding:1rem"><div class="empty-tx">Sem checkins ainda</div></div></div>
+          </div>
+          <div class="card">
+            <div class="ch"><div class="ct"><div class="ci" style="background:var(--mnl)">📊</div>NPS</div></div>
+            <div class="npsd">
+              <div class="npsv" id="npsVal" style="color:var(--mnm)">—</div>
+              <div class="npsl">Net Promoter Score</div>
+              <div class="npsb"><div class="nbf" id="npsBar" style="width:50%"></div></div>
+              <div class="nss"><span id="npsDet" style="color:var(--dgm)">—</span><span id="npsNeu">—</span><span id="npsPro" style="color:var(--mnm)">—</span></div>
+            </div>
+            <div style="border-top:.5px solid var(--br);padding-top:.75rem;margin-top:.5rem;" id="npsByArea"></div>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="card"><div class="ch"><div class="ct"><div class="ci" style="background:var(--wnl)">📈</div>NPS por Mês</div></div><canvas id="npsChart"></canvas></div>
+          <div class="card"><div class="ch"><div class="ct"><div class="ci" style="background:#fef9e7">🏆</div>Ranking de Gestores</div><span class="bd bd-ab">por score médio</span></div><div id="gestoresRank"><div class="empty" style="padding:1rem"><div class="empty-tx">Sem dados</div></div></div></div>
+        </div>
+        <div class="sh" style="margin-top:.25rem;"><div class="sht">People Analytics</div></div>
+        <div class="g3">
+          <div class="card"><div class="ch"><div class="ct"><div class="ci" style="background:var(--ppl)">🧬</div>Cultura por Área</div></div><div id="culturaBlock"><div class="empty" style="padding:1rem"><div class="empty-tx">Sem dados</div></div></div></div>
+          <div class="card"><div class="ch"><div class="ct"><div class="ci" style="background:var(--dgl)">⚡</div>Riscos NR-1</div></div><canvas id="riscosChart" height="160"></canvas></div>
+          <div class="card"><div class="ch"><div class="ct"><div class="ci">📋</div>Retenção</div></div><canvas id="retChart" height="160"></canvas></div>
+        </div>
+        <div class="g2">
+          <div class="card"><div class="ch"><div class="ct"><div class="ci" style="background:var(--dgl)">🚨</div>Alertas</div></div><div id="alertasBlock"><div class="empty" style="padding:1rem"><div class="empty-ic">✅</div><div class="empty-tx">Nenhum alerta</div></div></div></div>
+          <div class="card"><div class="ch"><div class="ct"><div class="ci" style="background:var(--mnl)">🌟</div>Evolução de Score</div></div><canvas id="scoreEvoChart" height="160"></canvas></div>
+        </div>
+      </div>
+
+      <!-- NR-1 -->
+      <div class="pg" id="pg-nr1">
+        <div class="g4">
+          <div class="kpi"><div class="kl">🔴 Riscos Altos</div><div class="kv dg" id="n1H">0</div><div class="ks">ação imediata</div></div>
+          <div class="kpi"><div class="kl">🟡 Riscos Médios</div><div class="kv wn" id="n1M">0</div><div class="ks">monitorar</div></div>
+          <div class="kpi"><div class="kl">🟢 Riscos Baixos</div><div class="kv mn" id="n1L">0</div><div class="ks">controlado</div></div>
+          <div class="kpi"><div class="kl">📋 Cobertura</div><div class="kv tl" id="n1C">—</div><div class="ks" id="n1CS"></div></div>
+        </div>
+        <div class="g2">
+          <div class="card"><div class="ch"><div class="ct"><div class="ci" style="background:var(--dgl)">🛡️</div>Riscos por Fator</div></div><canvas id="nr1Chart" height="180"></canvas></div>
+          <div class="card"><div class="ch"><div class="ct"><div class="ci">🔥</div>Heatmap Área × Fator</div></div><div id="heatBlock" class="tw"></div></div>
+        </div>
+        <div class="card">
+          <div class="ch"><div class="ct"><div class="ci" style="background:var(--dgl)">🚨</div>Casos de Risco Alto</div><span class="bd bd-dg" id="n1HCount">0 casos</span></div>
+          <div id="nr1Cases"><div class="empty"><div class="empty-ic">✅</div><div class="empty-tx">Nenhum risco alto</div></div></div>
+        </div>
+      </div>
+
+      <!-- EXPORTAÇÕES -->
+      <div class="pg" id="pg-exportar">
+        <div class="g2">
+          <div>
+            <div class="sh"><div class="sht">Excel (.csv)</div></div>
+            <div class="exp-opt" onclick="exportCSV('bruto')"><div class="exp-ic" style="background:#e8f5e9">📊</div><div><div class="exp-nm">Dados Brutos</div><div class="exp-ds">Todas as respostas em formato tabular</div></div><span class="exp-ar">↓</span></div>
+            <div class="exp-opt" onclick="exportCSV('indicadores')"><div class="exp-ic" style="background:#e8f5e9">📈</div><div><div class="exp-nm">Indicadores e KPIs</div><div class="exp-ds">Scores, NPS, taxas de retenção</div></div><span class="exp-ar">↓</span></div>
+            <div class="exp-opt" onclick="exportCSV('nr1')"><div class="exp-ic" style="background:#e8f5e9">🛡️</div><div><div class="exp-nm">Relatório NR-1</div><div class="exp-ds">Fatores de risco por colaborador</div></div><span class="exp-ar">↓</span></div>
+          </div>
+          <div>
+            <div class="sh"><div class="sht">Filtros de exportação</div></div>
+            <div class="card">
+              <div class="fg">
+                <div class="fld"><div class="flb">Área</div><select class="fi" style="width:100%" id="expArea"><option value="">Todas</option></select></div>
+                <div class="fld"><div class="flb">Gestor</div><select class="fi" style="width:100%" id="expGestor"><option value="">Todos</option></select></div>
+                <div class="fld"><div class="flb">Período</div><select class="fi" style="width:100%" id="expPeriod"><option value="">Todos os dados</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="365">2026</option></select></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- MODAL: NOVO COLABORADOR -->
+<div class="ov" id="moCollab" onclick="closeOv(event,'moCollab')">
+<div class="mo">
+  <div class="mh"><div class="mt" id="mCollabTitle">👤 Novo Colaborador</div><span class="mx" onclick="close_('moCollab')">×</span></div>
+  <div class="fg">
+    <div class="fl">
+      <div class="fld"><div class="flb">Nome completo <span class="req">*</span></div><input type="text" id="cNome" placeholder="Nome do colaborador"></div>
+      <div class="fld"><div class="flb">Cargo / Função <span class="req">*</span></div><input type="text" id="cCargo" placeholder="Ex: Analista de RH"></div>
+      <div class="fld"><div class="flb">Área / Departamento <span class="req">*</span></div><input type="text" id="cArea" placeholder="Ex: Tecnologia"></div>
+      <div class="fld"><div class="flb">Data de Admissão <span class="req">*</span></div><input type="date" id="cAdmissao"></div>
+      <div class="fld"><div class="flb">Gestor(a) <span class="req">*</span></div><select id="cGestor"><option value="">Selecione...</option></select></div>
+      <div class="fld"><div class="flb">Modalidade</div><select id="cModal"><option>Presencial</option><option>Híbrido</option><option>Remoto</option></select></div>
+      <div class="fld"><div class="flb">E-mail</div><input type="email" id="cEmail" placeholder="colaborador@joinin.com.br"></div>
+      <div class="fld"><div class="flb">Status</div><select id="cStatus"><option value="ativo">Ativo</option><option value="desligado">Desligado</option></select></div>
+    </div>
+  </div>
+  <input type="hidden" id="cEditId">
+  <div class="frow"><button class="btn" onclick="close_('moCollab')">Cancelar</button><button class="btn tl" id="cSaveBtn" onclick="saveCollab()">✓ Salvar</button></div>
+</div></div>
+
+<!-- MODAL: NOVO GESTOR -->
+<div class="ov" id="moGestor" onclick="closeOv(event,'moGestor')">
+<div class="mo">
+  <div class="mh"><div class="mt">👔 Novo Gestor</div><span class="mx" onclick="close_('moGestor')">×</span></div>
+  <div class="fg">
+    <div class="fl">
+      <div class="fld"><div class="flb">Nome completo <span class="req">*</span></div><input type="text" id="gNome" placeholder="Nome do gestor"></div>
+      <div class="fld"><div class="flb">Cargo</div><input type="text" id="gCargo" placeholder="Ex: Gerente de RH"></div>
+      <div class="fld"><div class="flb">Área</div><input type="text" id="gArea" placeholder="Ex: Recursos Humanos"></div>
+      <div class="fld"><div class="flb">E-mail</div><input type="email" id="gEmail" placeholder="gestor@joinin.com.br"></div>
+    </div>
+  </div>
+  <div class="frow"><button class="btn" onclick="close_('moGestor')">Cancelar</button><button class="btn tl" onclick="saveGestor()">✓ Salvar Gestor</button></div>
+</div></div>
+
+<!-- MODAL: CHECKIN -->
+<div class="ov" id="moCheckin" onclick="closeOv(event,'moCheckin')">
+<div class="mo wide">
+  <div class="mh"><div class="mt">📋 Check-in 45 dias — <span id="ckName"></span></div><span class="mx" onclick="close_('moCheckin')">×</span></div>
+  <div class="stps" id="ckSteps"></div>
+  <div id="ckArea"></div>
+  <div class="frow" id="ckNav">
+    <button class="btn" id="ckBack" onclick="ckMove(-1)" style="display:none">← Voltar</button>
+    <button class="btn pr" id="ckNext" onclick="ckMove(1)">Próximo →</button>
+  </div>
+</div></div>
+
+<!-- MODAL: VER DETALHE -->
+<div class="ov" id="moView" onclick="closeOv(event,'moView')">
+<div class="mo wide">
+  <div class="mh"><div class="mt" id="viewTitle">Detalhe</div><span class="mx" onclick="close_('moView')">×</span></div>
+  <div id="viewContent"></div>
+</div></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  CONFIG
+// ════════════════════════════════════════════════════════════════
+const API = '/api'; // netlify functions via redirect
+let TOKEN = localStorage.getItem('ji_token') || '';
+let USER  = null;
+
+// cache local dos dados
+let GESTORES = [];
+let COLABORADORES = [];
+let CHECKINS = [];
+
+// ════════════════════════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════════════════════════
+function authTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('on'));
+  event.target.classList.add('on');
+  document.getElementById('loginForm').style.display   = tab === 'login'    ? 'flex' : 'none';
+  document.getElementById('registerForm').style.display = tab === 'register' ? 'flex' : 'none';
+}
+
+async function doLogin() {
+  const email = v('loginEmail'), password = v('loginPass');
+  if (!email || !password) { authErr('loginErr', 'Preencha e-mail e senha.'); return; }
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true; btn.innerHTML = '<div class="spin" style="border-top-color:#fff"></div> Entrando...';
+  try {
+    const res = await api('auth', 'POST', { action: 'login', email, password });
+    TOKEN = res.token;
+    USER  = res.user;
+    localStorage.setItem('ji_token', TOKEN);
+    enterApp();
+  } catch (e) {
+    authErr('loginErr', e.message || 'E-mail ou senha incorretos.');
+  } finally {
+    btn.disabled = false; btn.innerHTML = '<span>Entrar na plataforma</span>';
+  }
+}
+
+async function doRegister() {
+  const name  = v('regName'), email = v('regEmail');
+  const pass  = v('regPass'),  pass2 = v('regPass2');
+  if (!name || !email || !pass) { authErr('regErr', 'Preencha todos os campos.'); return; }
+  if (pass !== pass2)           { authErr('regErr', 'As senhas não coincidem.'); return; }
+  if (pass.length < 8)          { authErr('regErr', 'Senha deve ter pelo menos 8 caracteres.'); return; }
+  const btn = document.getElementById('regBtn');
+  btn.disabled = true; btn.innerHTML = '<div class="spin" style="border-top-color:#fff"></div> Criando...';
+  try {
+    await api('auth', 'POST', { action: 'register', email, password: pass, name });
+    authOk('regOk', 'Conta criada! Verifique seu e-mail para confirmar e depois faça login.');
+    setTimeout(() => authTab('login'), 3000);
+  } catch (e) {
+    authErr('regErr', e.message || 'Erro ao criar conta.');
+  } finally {
+    btn.disabled = false; btn.innerHTML = '<span>Criar conta</span>';
+  }
+}
+
+async function doLogout() {
+  TOKEN = '';
+  USER  = null;
+  localStorage.removeItem('ji_token');
+  GESTORES = []; COLABORADORES = []; CHECKINS = [];
+  document.getElementById('appWrap').classList.remove('on');
+  document.getElementById('authWrap').style.display = 'flex';
+}
+
+function authErr(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.classList.add('on'); setTimeout(() => el.classList.remove('on'), 5000); }
+function authOk(id, msg)  { const el = document.getElementById(id); el.textContent = msg; el.classList.add('on'); }
+
+// ════════════════════════════════════════════════════════════════
+//  API LAYER
+// ════════════════════════════════════════════════════════════════
+async function api(path, method = 'GET', body = null, params = '') {
+  const url = `${API}/${path}${params ? '?' + params : ''}`;
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${TOKEN}` }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(url, opts);
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || `Erro ${res.status}`);
+  return data;
+}
+
+// ════════════════════════════════════════════════════════════════
+//  APP INIT
+// ════════════════════════════════════════════════════════════════
+async function enterApp() {
+  document.getElementById('authWrap').style.display = 'none';
+  document.getElementById('appWrap').classList.add('on');
+  document.getElementById('topDate').textContent = new Date().toLocaleDateString('pt-BR', { day:'2-digit', month:'long', year:'numeric' });
+  setTopActions('colaboradores');
+
+  // populate user info
+  if (USER?.profile?.name) {
+    const initials = USER.profile.name.trim().split(' ').filter(Boolean).map(p => p[0]).slice(0, 2).join('').toUpperCase();
+    document.getElementById('sideAvatar').textContent = initials;
+    document.getElementById('sideName').textContent   = USER.profile.name;
+  }
+
+  await loadAll();
+  renderCollabs();
+  updateAlertBadge();
+}
+
+async function loadAll() {
+  try {
+    [GESTORES, COLABORADORES, CHECKINS] = await Promise.all([
+      api('gestores'),
+      api('colaboradores'),
+      api('checkins'),
+    ]);
+    refreshFilters();
+  } catch(e) {
+    toast('Erro ao carregar dados: ' + e.message, 'er');
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  NAVIGATION
+// ════════════════════════════════════════════════════════════════
+const PAGE_TITLES = { colaboradores:'Colaboradores', historico:'Histórico', dashboard:'Dashboard RH', nr1:'Dashboard NR-1', exportar:'Exportações' };
+let currentPage = 'colaboradores';
+let dashCharts = {}, nr1Charts = {};
+
+function nav(el) {
+  const page = el.dataset.page;
+  if (page === currentPage) return;
+  currentPage = page;
+  document.querySelectorAll('.ni').forEach(n => n.classList.remove('on'));
+  el.classList.add('on');
+  document.querySelectorAll('.pg').forEach(p => p.classList.remove('on'));
+  document.getElementById('pg-' + page).classList.add('on');
+  document.getElementById('topTitle').textContent = PAGE_TITLES[page];
+  setTopActions(page);
+  if (page === 'colaboradores') renderCollabs();
+  if (page === 'historico')     renderHistory();
+  if (page === 'dashboard')     renderDashboard();
+  if (page === 'nr1')           renderNR1();
+  if (page === 'exportar')      refreshFilters();
+}
+
+function setTopActions(page) {
+  const el = document.getElementById('topActions');
+  if (page === 'colaboradores') {
+    el.innerHTML = `<button class="btn" onclick="open_('moGestor')">👔 Novo Gestor</button><button class="btn tl" onclick="openNewCollab()">＋ Novo Colaborador</button>`;
+  } else {
+    el.innerHTML = '';
+  }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  MODALS
+// ════════════════════════════════════════════════════════════════
+function open_(id)  { document.getElementById(id).classList.add('op'); }
+function close_(id) { document.getElementById(id).classList.remove('op'); }
+function closeOv(e, id) { if (e.target === document.getElementById(id)) close_(id); }
+
+// ════════════════════════════════════════════════════════════════
+//  GESTORES
+// ════════════════════════════════════════════════════════════════
+async function saveGestor() {
+  const nome = v('gNome');
+  if (!nome) { toast('Nome obrigatório', 'er'); return; }
+  try {
+    const g = await api('gestores', 'POST', { nome, cargo: v('gCargo'), area: v('gArea'), email: v('gEmail') });
+    GESTORES.push(g);
+    close_('moGestor');
+    ['gNome','gCargo','gArea','gEmail'].forEach(id => document.getElementById(id).value = '');
+    refreshFilters();
+    toast('Gestor cadastrado ✓', 'ok');
+  } catch(e) { toast(e.message, 'er'); }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  COLABORADORES
+// ════════════════════════════════════════════════════════════════
+function openNewCollab() {
+  document.getElementById('mCollabTitle').textContent = '👤 Novo Colaborador';
+  document.getElementById('cEditId').value = '';
+  ['cNome','cCargo','cArea','cEmail'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('cAdmissao').value = '';
+  document.getElementById('cStatus').value = 'ativo';
+  refreshGestorSelect();
+  open_('moCollab');
+}
+
+function refreshGestorSelect() {
+  const sel = document.getElementById('cGestor');
+  sel.innerHTML = '<option value="">Selecione o gestor...</option>';
+  GESTORES.forEach(g => { const o = document.createElement('option'); o.value = g.id; o.textContent = g.nome; sel.add(o); });
+}
+
+async function saveCollab() {
+  const nome = v('cNome'), cargo = v('cCargo'), area = v('cArea'), admissao = v('cAdmissao'), gestor_id = v('cGestor');
+  if (!nome || !cargo || !area || !admissao || !gestor_id) { toast('Preencha todos os campos obrigatórios', 'er'); return; }
+  const editId = v('cEditId');
+  const payload = { nome, cargo, area, gestor_id, admissao, modalidade: v('cModal'), email: v('cEmail'), status: v('cStatus') };
+  try {
+    if (editId) {
+      const updated = await api('colaboradores', 'PUT', payload, 'id=' + editId);
+      const idx = COLABORADORES.findIndex(c => c.id === editId);
+      if (idx !== -1) COLABORADORES[idx] = { ...COLABORADORES[idx], ...updated };
+      toast('Colaborador atualizado ✓', 'ok');
+    } else {
+      const novo = await api('colaboradores', 'POST', payload);
+      COLABORADORES.push(novo);
+      toast('Colaborador cadastrado ✓', 'ok');
+    }
+    close_('moCollab');
+    refreshFilters();
+    renderCollabs();
+  } catch(e) { toast(e.message, 'er'); }
+}
+
+function renderCollabs(filter = '', area = '', gestor = '', status = '') {
+  const q = filter.toLowerCase();
+  const rows = COLABORADORES.filter(c => {
+    if (q && !c.nome.toLowerCase().includes(q) && !c.cargo.toLowerCase().includes(q)) return false;
+    if (area && c.area !== area) return false;
+    if (gestor && c.gestor_id !== gestor) return false;
+    if (status && c.status !== status) return false;
+    return true;
+  });
+
+  const tbody = document.getElementById('collabBody');
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty"><div class="empty-ic">👥</div><div class="empty-tx">${COLABORADORES.length === 0 ? 'Nenhum colaborador cadastrado ainda' : 'Nenhum resultado para este filtro'}</div></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(c => {
+    const g  = c.gestores || GESTORES.find(x => x.id === c.gestor_id) || {};
+    const cks = CHECKINS.filter(x => x.colaborador_id === c.id);
+    const last = cks[0];
+    const days = Math.floor((Date.now() - new Date(c.admissao)) / 86400000);
+    const sc   = last ? scoreGeral(last).toFixed(1) : '—';
+    const nps  = last ? last.nps : null;
+    const npsC = nps === null ? 'bd-ab' : nps >= 9 ? 'bd-mn' : nps >= 7 ? 'bd-tl' : 'bd-dg';
+    const npsL = nps === null ? '—' : nps >= 9 ? `${nps} · Promotor` : nps >= 7 ? `${nps} · Neutro` : `${nps} · Detrator`;
+    const av  = initials(c.nome);
+    const col = avatarColor(c.id);
+    return `<tr onclick="openViewCollab('${c.id}')">
+      <td><div class="pc"><div class="pav" style="background:${col}">${av}</div><div><div class="pn">${c.nome}</div><div class="pr_">${c.cargo}</div></div></div></td>
+      <td><span class="bd bd-ab">${c.area}</span></td>
+      <td>${g.nome || '—'}</td>
+      <td><span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txf)">${fmtDate(c.admissao)}</span></td>
+      <td><span style="font-size:11px;font-family:'DM Mono',monospace">${days}d</span></td>
+      <td><span class="bd ${cks.length > 0 ? 'bd-tl' : 'bd-ab'}">${cks.length}</span></td>
+      <td><strong style="color:${last ? scoreColor(parseFloat(sc)) : 'var(--txf)'}">${sc}</strong></td>
+      <td><span class="bd ${npsC}">${npsL}</span></td>
+      <td><span class="bd ${c.status === 'ativo' ? 'bd-mn' : 'bd-dg'}">${c.status}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn sm tl" onclick="event.stopPropagation();openCheckin('${c.id}')">＋ Check-in</button>
+        <button class="btn sm" onclick="event.stopPropagation();editCollab('${c.id}')" style="margin-left:3px">✏</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterCollabs(q = '') {
+  q = q || v('searchCollab');
+  renderCollabs(q, v('fArea'), v('fGestor'), v('fStatus'));
+}
+
+function editCollab(id) {
+  const c = COLABORADORES.find(x => x.id === id);
+  if (!c) return;
+  document.getElementById('mCollabTitle').textContent = '✏ Editar Colaborador';
+  document.getElementById('cEditId').value  = id;
+  document.getElementById('cNome').value    = c.nome;
+  document.getElementById('cCargo').value   = c.cargo;
+  document.getElementById('cArea').value    = c.area;
+  document.getElementById('cAdmissao').value = c.admissao;
+  document.getElementById('cEmail').value   = c.email || '';
+  document.getElementById('cModal').value   = c.modalidade || 'Presencial';
+  document.getElementById('cStatus').value  = c.status;
+  refreshGestorSelect();
+  document.getElementById('cGestor').value  = c.gestor_id || '';
+  open_('moCollab');
+}
+
+function openViewCollab(id) {
+  const c  = COLABORADORES.find(x => x.id === id);
+  if (!c) return;
+  const g  = c.gestores || GESTORES.find(x => x.id === c.gestor_id) || {};
+  const cks = CHECKINS.filter(x => x.colaborador_id === id);
+  const days = Math.floor((Date.now() - new Date(c.admissao)) / 86400000);
+  const av = initials(c.nome), col = avatarColor(id);
+
+  const ckHtml = cks.length
+    ? cks.map(ck => {
+        const sc = scoreGeral(ck).toFixed(1);
+        const risk = nr1Risk(ck);
+        return `<div class="al ${risk==='alto'?'ah':risk==='medio'?'am':'ao'}" style="cursor:pointer;margin-bottom:.4rem" onclick="viewCheckin('${ck.id}')">
+          <span class="aic">📋</span>
+          <div style="flex:1">
+            <div class="atl">Check-in 45 dias — ${fmtDate(ck.data)}</div>
+            <div class="ads">Score: <strong>${sc}</strong> · NPS: <strong>${ck.nps}</strong> · Bem-estar: <strong>${(ck.score_bem||0).toFixed(1)}</strong></div>
+            <div style="display:flex;gap:5px;margin-top:4px"><span class="rp ${risk==='alto'?'rh':risk==='medio'?'rm':'rl'}">NR-1: ${risk}</span></div>
+          </div>
+          <span style="color:var(--txf);font-size:12px">ver →</span>
+        </div>`;
+      }).join('')
+    : `<div class="empty" style="padding:1.5rem"><div class="empty-ic">📋</div><div class="empty-tx">Nenhum check-in ainda</div></div>`;
+
+  document.getElementById('viewTitle').textContent = `👤 ${c.nome}`;
+  document.getElementById('viewContent').innerHTML = `
+    <div class="cd-hd">
+      <div class="cd-av" style="background:${col}">${av}</div>
+      <div>
+        <div class="cd-nm">${c.nome}</div>
+        <div class="cd-rl">${c.cargo} · ${c.area} · ${c.modalidade || '—'}</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:3px">Admissão ${fmtDate(c.admissao)} · ${days} dias · Gestor: ${g.nome || '—'}</div>
+      </div>
+      ${cks[0] ? `<div class="cd-mt">
+        <div><div class="cd-mvv">${scoreGeral(cks[0]).toFixed(1)}</div><div class="cd-mvl">SCORE</div></div>
+        <div><div class="cd-mvv">${cks[0].nps}</div><div class="cd-mvl">NPS</div></div>
+        <div><div class="cd-mvv">${cks.length}</div><div class="cd-mvl">CHECKINS</div></div>
+      </div>` : ''}
+    </div>
+    <div class="sh"><div class="sht">Histórico de Check-ins</div><button class="btn sm tl" onclick="close_('moView');openCheckin('${id}')">＋ Novo Check-in</button></div>
+    ${ckHtml}`;
+  open_('moView');
+}
+
+// ════════════════════════════════════════════════════════════════
+//  CHECK-IN FORM
+// ════════════════════════════════════════════════════════════════
+const THERMO_DEF = [
+  {id:'score_onb',  label:'Processo de onboarding geral', desc:'Clareza, organização, ritmo e materiais', color:'#04BFAD'},
+  {id:'score_integ',label:'Integração com a equipe',      desc:'Acolhimento, comunicação e colaboração',  color:'#91D9A3'},
+  {id:'score_dem',  label:'Clareza nas demandas',         desc:'As tarefas foram explicadas com clareza?', color:'#04BFAD'},
+  {id:'score_trei', label:'Treinamento e capacitação',    desc:'Os treinamentos foram suficientes?',       color:'#F5A623'},
+  {id:'score_tools',label:'Ferramentas e equipamentos',   desc:'Acesso a sistemas, equipamentos, recursos',color:'#04BFAD'},
+  {id:'score_lider',label:'Relacionamento com a liderança',desc:'Disponibilidade, comunicação e suporte', color:'#91D9A3'},
+  {id:'score_bem',  label:'Bem-estar e saúde mental',     desc:'Como o colaborador se sente emocionalmente?',color:'#E85C4A'},
+  {id:'score_pert', label:'Senso de pertencimento',       desc:'Sente que pertence a essa empresa?',       color:'#7F77DD'},
+  {id:'score_cult', label:'Identificação com a cultura',  desc:'Os valores da empresa fazem sentido?',     color:'#7F77DD'},
+];
+const EMOJIS_DEF = [
+  {id:'emoji_acolhido',label:'Se sentiu acolhido(a) desde o primeiro dia',emojis:['😕','😐','🙂','😊','🤩']},
+  {id:'emoji_perdido', label:'Se sentiu perdido(a) ou sobrecarregado(a)', emojis:['😊','🙂','😐','😕','😣']},
+  {id:'emoji_pronto',  label:'Se sente pronto(a) para contribuir',        emojis:['😕','😐','🙂','😊','💪']},
+  {id:'emoji_seguro',  label:'Se sente psicologicamente seguro(a)',        emojis:['😕','😐','🙂','😊','🛡️']},
+  {id:'emoji_orgulho', label:'Tem orgulho de fazer parte da empresa',      emojis:['😕','😐','🙂','😊','🌟']},
+];
+const NR1_FATORES = ['sobrecarga','suporte','conflitos','pressao','clareza','isolamento','seguranca'];
+const NR1_LABELS  = {sobrecarga:'Sobrecarga',suporte:'Falta de suporte',conflitos:'Conflitos',pressao:'Pressão excessiva',clareza:'Falta de clareza',isolamento:'Isolamento social',seguranca:'Seg. psicológica'};
+const TAGS_LIST   = ['Materiais mais claros','Mentor de onboarding','Agenda estruturada','Apresentações de área','Acesso antecipado','Manual de cultura','Reunião 1:1 mais cedo','Feedbacks mais frequentes','Espaço para errar','Comunicação mais clara'];
+const STEP_LABELS = ['Identificação','Termômetros','Percepção','Onboarding','Cultura','Expectativas','Sugestões'];
+
+let ckCollabId = '', ckCurrent = 0, ckData = {};
+
+function openCheckin(collabId) {
+  const c = COLABORADORES.find(x => x.id === collabId);
+  if (!c) return;
+  ckCollabId = collabId;
+  ckCurrent  = 0;
+  ckData     = { tags: [], nr1: {} };
+  document.getElementById('ckName').textContent = c.nome;
+  close_('moView');
+  renderCkSteps();
+  renderCkArea();
+  open_('moCheckin');
+}
+
+function renderCkSteps() {
+  document.getElementById('ckSteps').innerHTML = STEP_LABELS.map((l, i) =>
+    `<div class="stp_ ${i === ckCurrent ? 'on' : i < ckCurrent ? 'dn' : ''}" onclick="ckGoTo(${i})">${l}</div>`
+  ).join('');
+  document.getElementById('ckBack').style.display = ckCurrent > 0 ? '' : 'none';
+  const nxtBtn = document.getElementById('ckNext');
+  if (ckCurrent === 6) { nxtBtn.textContent = '✓ Salvar Check-in'; nxtBtn.className = 'btn tl'; }
+  else                  { nxtBtn.textContent = 'Próximo →';          nxtBtn.className = 'btn pr'; }
+}
+
+function ckGoTo(i) { if (i >= ckCurrent) return; ckSave(ckCurrent); ckCurrent = i; renderCkSteps(); renderCkArea(); }
+
+function ckMove(dir) {
+  if (dir === 1 && ckCurrent === 6) { saveCk(); return; }
+  ckSave(ckCurrent);
+  ckCurrent = Math.max(0, Math.min(6, ckCurrent + dir));
+  renderCkSteps(); renderCkArea();
+}
+
+function ckSave(step) {
+  if (step === 1) THERMO_DEF.forEach(t => { const el = document.getElementById('th_' + t.id); if (el) ckData[t.id] = parseFloat(el.dataset.val || 5); });
+  if (step === 2) EMOJIS_DEF.forEach(e => { const sel = document.querySelector(`.em-btn.on[data-em="${e.id}"]`); if (sel) ckData[e.id] = parseInt(sel.dataset.idx); });
+  if (step === 3) ['q1','q2','q3','q4','q5','q6','q7'].forEach(q => { const el = document.getElementById('ck_'+q); if(el) ckData[q] = el.value; });
+  if (step === 4) {
+    ['cv1','cv3','cv4','cv5','cv7','cv8'].forEach(q => { const el = document.getElementById('ck_'+q); if(el) ckData[q] = el.value; });
+    ['cv2','cv6'].forEach(q => { const s = document.querySelector(`.sc-btn.on[data-sc="${q}"]`); if(s) ckData[q + '_scale'] = parseInt(s.dataset.v); });
+    const ns = document.querySelector('.sc-btn.on[data-sc="nps"]'); if(ns) ckData.nps = parseInt(ns.dataset.v);
+  }
+  if (step === 5) ['e1','e2','e3','e4'].forEach(q => { const el = document.getElementById('ck_'+q); if(el) ckData[q] = el.value; });
+  if (step === 6) {
+    ['s1','s2','s3'].forEach(q => { const el = document.getElementById('ck_'+q); if(el) ckData[q] = el.value; });
+    ckData.tags = [...document.querySelectorAll('.tg.on')].map(t => t.textContent);
+    NR1_FATORES.forEach(f => { const s = document.querySelector(`select[data-nr1="${f}"]`); if(s) ckData['nr1_'+f] = s.value; });
+  }
+}
+
+function renderCkArea() {
+  const area = document.getElementById('ckArea');
+  const renders = [renderStep0, renderStep1, renderStep2, renderStep3, renderStep4, renderStep5, renderStep6];
+  area.innerHTML = renders[ckCurrent]();
+  if (ckCurrent === 1) bindThermos();
+}
+
+function renderStep0() {
+  const c = COLABORADORES.find(x => x.id === ckCollabId) || {};
+  const g = c.gestores || GESTORES.find(x => x.id === c.gestor_id) || {};
+  return `<div class="card" style="background:var(--sf2)">
+    <div class="fl">
+      <div class="fld"><div class="flb">Colaborador</div><input type="text" value="${c.nome||''}" disabled></div>
+      <div class="fld"><div class="flb">Cargo</div><input type="text" value="${c.cargo||''}" disabled></div>
+      <div class="fld"><div class="flb">Área</div><input type="text" value="${c.area||''}" disabled></div>
+      <div class="fld"><div class="flb">Admissão</div><input type="text" value="${fmtDate(c.admissao)}" disabled></div>
+      <div class="fld"><div class="flb">Gestor(a)</div><input type="text" value="${g.nome||'—'}" disabled></div>
+      <div class="fld"><div class="flb">Modalidade</div><input type="text" value="${c.modalidade||'—'}" disabled></div>
+    </div>
+    <div style="margin-top:.75rem;background:var(--abl);border-radius:var(--rs);padding:.65rem .9rem;font-size:11px;color:var(--txm)">
+      📋 Formulário preenchido pelo RH em conversa com o colaborador. Dados tratados conforme a LGPD (Lei 13.709/2018).
+    </div>
+  </div>`;
+}
+
+function renderStep1() {
+  return `<div class="card">${THERMO_DEF.map((t, i) => `
+    <div class="th-item">
+      <div class="th-top"><span class="th-n">${t.label}</span><span class="th-v" id="thv_${t.id}">${(ckData[t.id]||5).toFixed(1)}</span></div>
+      <div class="th-d">${t.desc}</div>
+      <div class="th-tr">
+        <span class="th-tk">0</span>
+        <div class="th-track" id="th_${t.id}" data-val="${ckData[t.id]||5}">
+          <div class="th-fill" id="thf_${t.id}" style="width:${(ckData[t.id]||5)*10}%;background:${t.color}"></div>
+        </div>
+        <span class="th-tk">10</span>
+      </div>
+      ${i < THERMO_DEF.length-1 ? '<div class="divs"></div>' : ''}
+    </div>`).join('')}</div>`;
+}
+
+function bindThermos() {
+  THERMO_DEF.forEach(t => {
+    const el = document.getElementById('th_' + t.id);
+    if (!el) return;
+    const handle = (e) => {
+      if (e.type === 'mousemove' && e.buttons !== 1) return;
+      const rect = el.getBoundingClientRect();
+      const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const val  = Math.round(pct * 100) / 10;
+      el.dataset.val = val;
+      document.getElementById('thf_' + t.id).style.width = (val * 10) + '%';
+      document.getElementById('thv_' + t.id).textContent = val.toFixed(1);
+      ckData[t.id] = val;
+    };
+    el.addEventListener('click', handle);
+    el.addEventListener('mousemove', handle);
+  });
+}
+
+function renderStep2() {
+  return `<div class="card">${EMOJIS_DEF.map((e, ei) => `
+    <div style="margin-bottom:${ei<EMOJIS_DEF.length-1?'12px':'0'}">
+      <div class="ql">${e.label}</div>
+      <div class="em-row">${e.emojis.map((em, i) =>
+        `<button class="em-btn ${ckData[e.id]===i?'on':''}" data-em="${e.id}" data-idx="${i}" onclick="selEmoji('${e.id}',${i},this)">${em}</button>`
+      ).join('')}</div>
+      ${ei<EMOJIS_DEF.length-1?'<div class="divs"></div>':''}
+    </div>`).join('')}</div>`;
+}
+
+function selEmoji(id, idx, el) {
+  document.querySelectorAll(`.em-btn[data-em="${id}"]`).forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  ckData[id] = idx;
+}
+
+function renderStep3() {
+  const qs = [
+    {id:'q1',text:'Como foi a primeira semana? O que surpreendeu positiva ou negativamente?'},
+    {id:'q2',text:'As demandas foram passadas com clareza? Sabia o que era esperado?'},
+    {id:'q3',text:'Houve dificuldades não resolvidas? Como foram tratadas?'},
+    {id:'q4',text:'Recebeu todos os acessos, equipamentos e ferramentas? Faltou algo?'},
+    {id:'q5',text:'Como está o relacionamento com a equipe e o(a) gestor(a)?'},
+    {id:'q6',text:'Houve momentos de sobrecarga, ansiedade ou falta de suporte emocional?'},
+    {id:'q7',text:'Os treinamentos foram suficientes para o trabalho do dia a dia?'},
+  ];
+  return qs.map(q => `<div class="card" style="margin-bottom:.5rem">
+    <div class="ql">${q.text}</div>
+    <textarea id="ck_${q.id}" rows="2" placeholder="Registre a resposta...">${ckData[q.id]||''}</textarea>
+  </div>`).join('');
+}
+
+function renderStep4() {
+  const textQs = [
+    {id:'cv1',text:'Qual era a expectativa sobre a cultura antes de entrar? Foi correspondida?'},
+    {id:'cv3',text:'Consegue identificar os valores em atitudes concretas? Dê um exemplo.'},
+    {id:'cv4',text:'Existe algo na empresa que inspira ou admira?'},
+    {id:'cv5',text:'Percebeu comportamento contraditório com o que a empresa prega?'},
+    {id:'cv7',text:'Como descreveria a cultura para um amigo considerar trabalhar aqui?'},
+    {id:'cv8',text:'O que a empresa poderia fazer diferente para fortalecer a cultura?'},
+  ];
+  let html = `
+    <div class="card" style="margin-bottom:.5rem">
+      <div class="ql">Em uma escala de 1 a 5, o quanto os valores são vividos no dia a dia?</div>
+      <div class="sc-row">${[1,2,3,4,5].map(n=>`<div class="sc-btn ${ckData.cv2_scale===n?'on':''}" data-sc="cv2" data-v="${n}" onclick="selScale('cv2',${n},this)">${n}</div>`).join('')}</div>
+      <div class="sc-lbs"><span>Não percebo</span><span>Percebo muito</span></div>
+    </div>
+    ${textQs.map(q=>`<div class="card" style="margin-bottom:.5rem">
+      <div class="ql">${q.text}</div>
+      <textarea id="ck_${q.id}" rows="2" placeholder="Registre a resposta...">${ckData[q.id]||''}</textarea>
+    </div>`).join('')}
+    <div class="card" style="margin-bottom:.5rem">
+      <div class="ql">O quanto se sente livre para ser ele(a) mesmo(a) aqui?</div>
+      <div class="sc-row">${[1,2,3,4,5].map(n=>`<div class="sc-btn ${ckData.cv6_scale===n?'on':''}" data-sc="cv6" data-v="${n}" onclick="selScale('cv6',${n},this)">${n}</div>`).join('')}</div>
+      <div class="sc-lbs"><span>Muito difícil</span><span>Totalmente livre</span></div>
+    </div>
+    <div class="card">
+      <div class="ql">NPS — De 0 a 10, quanto recomendaria a JoinIn para um amigo trabalhar?</div>
+      <div class="sc-row">${[0,1,2,3,4,5,6,7,8,9,10].map(n=>`<div class="sc-btn ${ckData.nps===n?'on':''}" data-sc="nps" data-v="${n}" onclick="selScale('nps',${n},this)">${n}</div>`).join('')}</div>
+      <div class="sc-lbs"><span>Jamais</span><span>Com certeza!</span></div>
+    </div>`;
+  return html;
+}
+
+function selScale(id, val, el) {
+  document.querySelectorAll(`.sc-btn[data-sc="${id}"]`).forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+  if (id === 'cv2') ckData.cv2_scale = val;
+  else if (id === 'cv6') ckData.cv6_scale = val;
+  else ckData[id] = val;
+}
+
+function renderStep5() {
+  const qs = [
+    {id:'e1',text:'Quais são os principais objetivos para os próximos 45 dias?'},
+    {id:'e2',text:'Existe alguma área ou habilidade que gostaria de desenvolver?'},
+    {id:'e3',text:'Que tipo de suporte vai precisar para atingir esses objetivos?'},
+    {id:'e4',text:'Há algo para alinhar com o(a) gestor(a) antes de seguir?'},
+  ];
+  return qs.map(q => `<div class="card" style="margin-bottom:.5rem">
+    <div class="ql">${q.text}</div>
+    <textarea id="ck_${q.id}" rows="2" placeholder="Registre a resposta...">${ckData[q.id]||''}</textarea>
+  </div>`).join('');
+}
+
+function renderStep6() {
+  const qs = [
+    {id:'s1',text:'O que poderia ter sido diferente no onboarding para facilitar a chegada?'},
+    {id:'s2',text:'Se pudesse mudar uma coisa na empresa agora, o que seria?'},
+    {id:'s3',text:'Alguma ideia, sugestão ou proposta para a liderança?'},
+  ];
+  return qs.map(q => `<div class="card" style="margin-bottom:.5rem">
+    <div class="ql">${q.text}</div>
+    <textarea id="ck_${q.id}" rows="2" placeholder="Registre a resposta...">${ckData[q.id]||''}</textarea>
+  </div>`).join('')
+  + `<div class="card" style="margin-bottom:.5rem">
+    <div class="ql">Tags de sugestão — marque as mencionadas</div>
+    <div class="tg-row">${TAGS_LIST.map(t=>`<span class="tg ${(ckData.tags||[]).includes(t)?'on':''}" onclick="this.classList.toggle('on')">${t}</span>`).join('')}</div>
+  </div>`
+  + `<div class="card">
+    <div class="ql" style="margin-bottom:.75rem">Avaliação NR-1 — fatores psicossociais (percepção do RH)</div>
+    ${NR1_FATORES.map(f=>`<div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.4rem">
+      <span style="flex:1;font-size:12px;color:var(--txm)">${NR1_LABELS[f]}</span>
+      <select data-nr1="${f}" style="width:120px;font-size:12px">
+        <option value="baixo" ${(ckData['nr1_'+f]||'baixo')==='baixo'?'selected':''}>🟢 Baixo</option>
+        <option value="medio" ${(ckData['nr1_'+f])==='medio'?'selected':''}>🟡 Médio</option>
+        <option value="alto"  ${(ckData['nr1_'+f])==='alto' ?'selected':''}>🔴 Alto</option>
+      </select>
+    </div>`).join('')}
+  </div>`;
+}
+
+async function saveCk() {
+  ckSave(6);
+  if (ckData.nps === undefined || ckData.nps === null) { toast('Informe o NPS antes de salvar', 'er'); return; }
+  THERMO_DEF.forEach(t => { if (!ckData[t.id]) ckData[t.id] = 5; });
+  const payload = { colaborador_id: ckCollabId, data: new Date().toISOString().slice(0,10), ...ckData };
+  try {
+    const saved = await api('checkins', 'POST', payload);
+    CHECKINS.unshift(saved);
+    close_('moCheckin');
+    renderCollabs();
+    updateAlertBadge();
+    toast('Check-in salvo com sucesso ✓', 'ok');
+  } catch(e) { toast(e.message, 'er'); }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  VIEW CHECKIN
+// ════════════════════════════════════════════════════════════════
+function viewCheckin(ckId) {
+  const ck = CHECKINS.find(x => x.id === ckId);
+  if (!ck) return;
+  const collab = ck.colaboradores || COLABORADORES.find(x => x.id === ck.colaborador_id) || {};
+  const sc = scoreGeral(ck).toFixed(1);
+  const risk = nr1Risk(ck);
+  const npsLbl = ck.nps >= 9 ? 'Promotor' : ck.nps >= 7 ? 'Neutro' : 'Detrator';
+
+  const scoresHtml = THERMO_DEF.map(t => `
+    <div class="si">
+      <div class="stp"><span class="sn">${t.label}</span><span class="sv">${(ck[t.id]||0).toFixed(1)}</span></div>
+      <div class="sb"><div class="sf_" style="width:${(ck[t.id]||0)*10}%;background:${t.color}"></div></div>
+    </div>`).join('');
+
+  const nr1Html = NR1_FATORES.map(f => {
+    const val = ck['nr1_'+f] || 'baixo';
+    return `<span class="rp ${val==='alto'?'rh':val==='medio'?'rm':'rl'}">${NR1_LABELS[f]}: ${val}</span>`;
+  }).join(' ');
+
+  document.getElementById('viewTitle').textContent = `📋 Check-in — ${collab.nome||'?'} — ${fmtDate(ck.data)}`;
+  document.getElementById('viewContent').innerHTML = `
+    <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:1rem">
+      <span class="bd bd-ab">${fmtDate(ck.data)}</span>
+      <span class="bd ${ck.nps>=9?'bd-mn':ck.nps>=7?'bd-tl':'bd-dg'}">NPS ${ck.nps} · ${npsLbl}</span>
+      <span class="rp ${risk==='alto'?'rh':risk==='medio'?'rm':'rl'}">NR-1: ${risk}</span>
+      <strong style="font-size:13px;color:${scoreColor(parseFloat(sc))}">${sc} score geral</strong>
+    </div>
+    <div class="g2">
+      <div class="card"><div class="ch"><div class="ct">🌡️ Scores</div></div>${scoresHtml}</div>
+      <div class="card">
+        <div class="ch"><div class="ct">🛡️ NR-1</div></div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px">${nr1Html}</div>
+        ${ck.tags?.length ? `<div style="margin-top:.75rem"><div style="font-size:10px;color:var(--txf);margin-bottom:5px">Tags</div><div class="tg-row">${ck.tags.map(t=>`<span class="tg on">${t}</span>`).join('')}</div></div>` : ''}
+      </div>
+    </div>
+    ${[
+      {l:'Primeira semana',v:ck.q1},{l:'Clareza das demandas',v:ck.q2},{l:'Dificuldades',v:ck.q3},
+      {l:'Ferramentas',v:ck.q4},{l:'Relacionamentos',v:ck.q5},{l:'Bem-estar',v:ck.q6},{l:'Treinamento',v:ck.q7},
+      {l:'Expectativa cultural',v:ck.cv1},{l:'Valores na prática',v:ck.cv3},{l:'Inspiração',v:ck.cv4},
+      {l:'Objetivos próx. 45d',v:ck.e1},{l:'Sugestão onboarding',v:ck.s1},{l:'Mudaria na empresa',v:ck.s2},
+    ].filter(x=>x.v).map(x=>`<div class="card" style="margin-bottom:.4rem"><div style="font-size:10px;font-family:'DM Mono',monospace;color:var(--txf);margin-bottom:4px">${x.l}</div><div style="font-size:12px;color:var(--txm);line-height:1.6">${x.v}</div></div>`).join('')}
+  `;
+  open_('moView');
+}
+
+// ════════════════════════════════════════════════════════════════
+//  HISTORY
+// ════════════════════════════════════════════════════════════════
+function renderHistory(q = '', area = '', period = '') {
+  const now = Date.now();
+  const tbody = document.getElementById('histBody');
+  const rows = CHECKINS.filter(ck => {
+    const c = ck.colaboradores || COLABORADORES.find(x => x.id === ck.colaborador_id) || {};
+    if (q && !c.nome?.toLowerCase().includes(q.toLowerCase())) return false;
+    if (area && c.area !== area) return false;
+    if (period) { const d = (now - new Date(ck.data)) / 86400000; if (d > parseInt(period)) return false; }
+    return true;
+  });
+
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="10"><div class="empty"><div class="empty-ic">📋</div><div class="empty-tx">${CHECKINS.length===0?'Nenhum check-in registrado ainda':'Nenhum resultado'}</div></div></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = rows.map(ck => {
+    const c  = ck.colaboradores || COLABORADORES.find(x => x.id === ck.colaborador_id) || {};
+    const g  = c.gestores || GESTORES.find(x => x.id === c.gestor_id) || {};
+    const sc = scoreGeral(ck).toFixed(1);
+    const risk = nr1Risk(ck);
+    const npsLbl = ck.nps>=9?'Promotor':ck.nps>=7?'Neutro':'Detrator';
+    const av = initials(c.nome||'?'), col = avatarColor(c.id||'');
+    return `<tr onclick="viewCheckin('${ck.id}')" style="cursor:pointer">
+      <td><div class="pc"><div class="pav" style="background:${col}">${av}</div><div><div class="pn">${c.nome||'—'}</div><div class="pr_">${c.cargo||'—'}</div></div></div></td>
+      <td><span class="bd bd-ab">${c.area||'—'}</span></td>
+      <td>${g.nome||'—'}</td>
+      <td><span style="font-size:11px;font-family:'DM Mono',monospace;color:var(--txf)">${fmtDate(ck.data)}</span></td>
+      <td><strong style="color:${scoreColor(parseFloat(sc))}">${sc}</strong></td>
+      <td><span class="bd ${ck.nps>=9?'bd-mn':ck.nps>=7?'bd-tl':'bd-dg'}">${ck.nps} · ${npsLbl}</span></td>
+      <td><strong style="color:${scoreColor(ck.score_bem||0)}">${(ck.score_bem||0).toFixed(1)}</strong></td>
+      <td><strong style="color:${scoreColor(ck.score_lider||0)}">${(ck.score_lider||0).toFixed(1)}</strong></td>
+      <td><span class="rp ${risk==='alto'?'rh':risk==='medio'?'rm':'rl'}">${risk}</span></td>
+      <td><button class="btn sm">ver →</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterHistory(q = '') {
+  q = q || v('searchHist');
+  renderHistory(q, v('hArea'), v('hPeriod'));
+}
+
+// ════════════════════════════════════════════════════════════════
+//  DASHBOARD
+// ════════════════════════════════════════════════════════════════
+function renderDashboard() {
+  const cks = CHECKINS, cs = COLABORADORES, gs = GESTORES;
+  destroyAllCharts();
+
+  if (!cks.length) {
+    ['dCheckins','dAtivos','dNPS','dScore','dRet45','dRet90','dBem','dRiscos'].forEach(id => { const el=document.getElementById(id); if(el) el.textContent='—'; });
+    document.getElementById('scoresBlock').innerHTML = '<div class="empty" style="padding:1rem"><div class="empty-tx">Nenhum check-in ainda</div></div>';
+    return;
+  }
+
+  const ativos = cs.filter(c => c.status === 'ativo').length;
+  const ps = cks.filter(c => c.nps >= 9).length, ds = cks.filter(c => c.nps <= 6).length, neu = cks.filter(c => c.nps >= 7 && c.nps <= 8).length;
+  const nps = cks.length ? Math.round(ps/cks.length*100 - ds/cks.length*100) : 0;
+  const avgSc = avg(cks.map(c => scoreGeral(c)));
+  const avgBem = avg(cks.map(c => c.score_bem || 0));
+  const highRisks = cks.filter(c => nr1Risk(c) === 'alto').length;
+
+  document.getElementById('dCheckins').textContent = cks.length;
+  document.getElementById('dCheckinsSub').textContent = `${cs.length} colaboradores`;
+  document.getElementById('dAtivos').textContent = ativos;
+  document.getElementById('dAtivosSub').textContent = `${Math.round(ativos/Math.max(cs.length,1)*100)}% de retenção`;
+  document.getElementById('dNPS').textContent = (nps >= 0 ? '+' : '') + nps;
+  document.getElementById('dNPS').className = 'kv ' + (nps >= 50 ? 'mn' : nps >= 25 ? 'tl' : nps >= 0 ? '' : 'dg');
+  const npscat = nps>=50?'Excelente':nps>=25?'Bom':nps>=0?'Razoável':'Crítico';
+  document.getElementById('dNPSCat').textContent = npscat;
+  document.getElementById('dNPSCat').className = 'kt ' + (nps>=25?'ku':nps>=0?'kn':'kd');
+  document.getElementById('dScore').textContent = avgSc.toFixed(1);
+  document.getElementById('dScoreSub').textContent = `base: ${cks.length} respostas`;
+  document.getElementById('scoreBase').textContent = `${cks.length} respostas`;
+  document.getElementById('dBem').textContent = avgBem.toFixed(1);
+  document.getElementById('dBemSub').textContent = avgBem < 6 ? '⚠ abaixo do limiar' : 'dentro do esperado';
+  document.getElementById('dRiscos').textContent = highRisks;
+  document.getElementById('dRiscosSub').textContent = highRisks > 0 ? 'requerem ação' : 'situação controlada';
+
+  // Retenção
+  const now = Date.now();
+  const el45 = cs.filter(c => daysAgo(c.admissao) >= 45);
+  const el90 = cs.filter(c => daysAgo(c.admissao) >= 90);
+  const r45 = el45.length ? Math.round(el45.filter(c=>c.status==='ativo').length/el45.length*100) : null;
+  const r90 = el90.length ? Math.round(el90.filter(c=>c.status==='ativo').length/el90.length*100) : null;
+  document.getElementById('dRet45').textContent = r45 !== null ? r45+'%' : '—';
+  document.getElementById('dRet45s').textContent = r45 !== null ? `${el45.length} elegíveis` : 'sem dados';
+  document.getElementById('dRet90').textContent = r90 !== null ? r90+'%' : '—';
+  document.getElementById('dRet90s').textContent = r90 !== null ? `${el90.length} elegíveis` : 'sem dados';
+
+  // NPS display
+  document.getElementById('npsVal').textContent = (nps>=0?'+':'')+nps;
+  document.getElementById('npsVal').style.color = nps>=25?'var(--mnm)':nps>=0?'var(--wnm)':'var(--dgm)';
+  document.getElementById('npsBar').style.width = Math.max(5,Math.min(95,(nps+100)/2))+'%';
+  document.getElementById('npsDet').textContent = `Detratores ${Math.round(ds/cks.length*100)}%`;
+  document.getElementById('npsNeu').textContent = `Neutros ${Math.round(neu/cks.length*100)}%`;
+  document.getElementById('npsPro').textContent = `Promotores ${Math.round(ps/cks.length*100)}%`;
+
+  // Scores block
+  document.getElementById('scoresBlock').innerHTML = THERMO_DEF.map(t => {
+    const a = avg(cks.map(c => c[t.id]||0));
+    return `<div class="si">
+      <div class="stp"><span class="sn">${t.label}</span><span class="sv">${a.toFixed(1)}</span></div>
+      <div class="sb"><div class="sf_" style="width:${a*10}%;background:${t.color}"></div></div>
+    </div>`;
+  }).join('');
+
+  // NPS by area
+  const areas = [...new Set(cs.map(c=>c.area))];
+  document.getElementById('npsByArea').innerHTML = areas.map(ar => {
+    const arCks = cks.filter(ck => { const c=cs.find(x=>x.id===ck.colaborador_id); return c&&c.area===ar; });
+    if (!arCks.length) return '';
+    const p=arCks.filter(c=>c.nps>=9).length, d=arCks.filter(c=>c.nps<=6).length;
+    const n = Math.round(p/arCks.length*100 - d/arCks.length*100);
+    return `<div class="si"><div class="stp"><span class="sn">${ar}</span><span class="sv">${n>=0?'+':''}${n}</span></div>
+      <div class="sb"><div class="sf_" style="width:${Math.max(5,Math.min(95,(n+100)/2))}%;background:${n>=25?'var(--mn)':n>=0?'var(--tl)':'var(--dg)'}"></div></div></div>`;
+  }).join('') || '<div style="font-size:11px;color:var(--txf)">Sem dados por área</div>';
+
+  // Gestores rank
+  document.getElementById('gestoresRank').innerHTML = gs.map(g => {
+    const gcks = cks.filter(ck => { const c=cs.find(x=>x.id===ck.colaborador_id); return c&&c.gestor_id===g.id; });
+    return gcks.length ? { g, sc: avg(gcks.map(c=>scoreGeral(c))), n: gcks.length } : null;
+  }).filter(Boolean).sort((a,b)=>b.sc-a.sc).map((x,i) =>
+    `<div class="ri"><span class="rn ${i===0?'gd':''}">${i+1}</span><span class="rnm">${x.g.nome}</span><span class="bd bd-ab">${x.n} checkins</span><span class="rsc">${x.sc.toFixed(1)}</span></div>`
+  ).join('') || '<div class="empty" style="padding:1rem"><div class="empty-tx">Sem dados</div></div>';
+
+  // Cultura
+  document.getElementById('culturaBlock').innerHTML = areas.map(ar => {
+    const arCks = cks.filter(ck => { const c=cs.find(x=>x.id===ck.colaborador_id); return c&&c.area===ar; });
+    if (!arCks.length) return '';
+    const sc = avg(arCks.map(c=>avg([c.score_cult||0,c.score_pert||0])));
+    return `<div class="ri"><span class="rnm">${ar}</span><span class="bd ${sc>=8?'bd-mn':sc>=7?'bd-tl':sc>=6?'bd-wn':'bd-dg'}">${sc>=8?'Alta':sc>=7?'Boa':sc>=6?'Média':'Atenção'}</span><span class="rsc">${sc.toFixed(1)}</span></div>`;
+  }).join('') || '<div class="empty" style="padding:1rem"><div class="empty-tx">Sem dados</div></div>';
+
+  // Alertas
+  const alerts = cks.filter(c=>nr1Risk(c)==='alto'||c.nps<=4);
+  document.getElementById('alertasBlock').innerHTML = alerts.length
+    ? alerts.map(ck => {
+        const c = cs.find(x=>x.id===ck.colaborador_id)||{};
+        return `<div class="al ah"><span class="aic">${nr1Risk(ck)==='alto'?'🚨':'📉'}</span>
+          <div><div class="atl">${nr1Risk(ck)==='alto'?'Risco Psicossocial Alto':'NPS Detrator'} — ${c.nome||'?'}</div>
+          <div class="ads">${c.cargo||''} · ${c.area||''} · NPS: ${ck.nps}</div>
+          <div class="atm">${fmtDate(ck.data)}</div></div></div>`;
+      }).join('')
+    : '<div class="empty" style="padding:1rem"><div class="empty-ic">✅</div><div class="empty-tx">Nenhum alerta</div></div>';
+
+  // Charts
+  const CC = { tl:'#04BFAD',mn:'#91D9A3',wn:'#F5A623',dg:'#E85C4A',pp:'#7F77DD' };
+  const go = { color:'rgba(5,65,89,0.06)' };
+  const base = { responsive:true, maintainAspectRatio:true, plugins:{legend:{display:false}}, scales:{x:{grid:go,ticks:{font:{size:9},color:'#7fa4b4'}},y:{grid:go,ticks:{font:{size:9},color:'#7fa4b4'}}} };
+
+  // NPS mensal
+  const months = {};
+  cks.forEach(ck => { const m=ck.data.slice(0,7); if(!months[m]) months[m]={p:0,d:0,t:0}; months[m].t++; if(ck.nps>=9)months[m].p++; if(ck.nps<=6)months[m].d++; });
+  const mKeys = Object.keys(months).sort().slice(-6);
+  dashCharts.nps = new Chart(document.getElementById('npsChart'), {
+    type:'line',
+    data:{ labels:mKeys.map(k=>{ const d=new Date(k+'-01'); return d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}); }),
+           datasets:[{data:mKeys.map(k=>Math.round(months[k].p/months[k].t*100-months[k].d/months[k].t*100)),borderColor:CC.tl,backgroundColor:'rgba(4,191,173,.1)',borderWidth:2,fill:true,tension:.4,pointRadius:3,pointBackgroundColor:CC.tl}] },
+    options: base
+  });
+
+  // Riscos
+  dashCharts.riscos = new Chart(document.getElementById('riscosChart'), {
+    type:'bar',
+    data:{ labels:NR1_FATORES.map(f=>NR1_LABELS[f].slice(0,10)),
+           datasets:[
+             {label:'Alto',data:NR1_FATORES.map(f=>cks.filter(c=>(c['nr1_'+f]||'baixo')==='alto').length),backgroundColor:CC.dg,borderRadius:3},
+             {label:'Médio',data:NR1_FATORES.map(f=>cks.filter(c=>(c['nr1_'+f]||'baixo')==='medio').length),backgroundColor:CC.wn,borderRadius:3},
+           ]},
+    options:{...base,plugins:{legend:{display:true,labels:{font:{size:9},boxWidth:10}}},scales:{x:{...base.scales.x,stacked:true},y:{...base.scales.y,stacked:true}}}
+  });
+
+  // Retenção
+  dashCharts.ret = new Chart(document.getElementById('retChart'), {
+    type:'doughnut',
+    data:{labels:['Ativos','Desligados'],datasets:[{data:[ativos,cs.length-ativos],backgroundColor:[CC.tl,CC.dg],borderWidth:0,hoverOffset:4}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:true,labels:{font:{size:9},boxWidth:10}}}}
+  });
+
+  // Score evo
+  const scoreByM = mKeys.map(m => { const mCks=cks.filter(c=>c.data.slice(0,7)===m); return mCks.length?avg(mCks.map(c=>scoreGeral(c))):null; });
+  dashCharts.scoreEvo = new Chart(document.getElementById('scoreEvoChart'), {
+    type:'line',
+    data:{labels:mKeys.map(k=>{ const d=new Date(k+'-01'); return d.toLocaleDateString('pt-BR',{month:'short',year:'2-digit'}); }),
+          datasets:[{data:scoreByM,borderColor:CC.pp,backgroundColor:'rgba(127,119,221,.1)',borderWidth:2,fill:true,tension:.4,pointRadius:3,spanGaps:true,pointBackgroundColor:CC.pp}]},
+    options: base
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  NR-1
+// ════════════════════════════════════════════════════════════════
+function renderNR1() {
+  const cks = CHECKINS, cs = COLABORADORES;
+  if (nr1Charts.factor) { nr1Charts.factor.destroy(); delete nr1Charts.factor; }
+
+  const highs = cks.filter(c => nr1Risk(c) === 'alto');
+  const mids  = cks.filter(c => nr1Risk(c) === 'medio');
+  const lows  = cks.filter(c => nr1Risk(c) === 'baixo');
+  document.getElementById('n1H').textContent = highs.length;
+  document.getElementById('n1M').textContent = mids.length;
+  document.getElementById('n1L').textContent = lows.length;
+  document.getElementById('n1C').textContent = cs.length ? Math.round(cks.length/cs.length*100)+'%' : '—';
+  document.getElementById('n1CS').textContent = `${cks.length}/${cs.length} avaliados`;
+  document.getElementById('n1HCount').textContent = `${highs.length} casos`;
+  document.getElementById('alertBadge').textContent = highs.length;
+  document.getElementById('alertBadge').style.display = highs.length ? '' : 'none';
+
+  document.getElementById('nr1Cases').innerHTML = highs.length
+    ? highs.map(ck => {
+        const c = cs.find(x=>x.id===ck.colaborador_id)||{};
+        const g = c.gestores || GESTORES.find(x=>x.id===c.gestor_id)||{};
+        const hf = NR1_FATORES.filter(f=>(ck['nr1_'+f]||'baixo')==='alto');
+        const mf = NR1_FATORES.filter(f=>(ck['nr1_'+f]||'baixo')==='medio');
+        return `<div class="al ah" style="cursor:pointer;margin-bottom:.5rem" onclick="viewCheckin('${ck.id}')">
+          <span class="aic">🚨</span>
+          <div style="flex:1">
+            <div class="atl">${c.nome||'?'} · ${c.cargo||'?'} · ${c.area||'?'}</div>
+            <div class="ads">NPS ${ck.nps} · Bem-estar ${(ck.score_bem||0).toFixed(1)} · Gestor: ${g.nome||'—'} · ${fmtDate(ck.data)}</div>
+            <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px">
+              ${hf.map(f=>`<span class="rp rh">${NR1_LABELS[f]}</span>`).join('')}
+              ${mf.map(f=>`<span class="rp rm">${NR1_LABELS[f]}</span>`).join('')}
+            </div>
+          </div>
+          <span style="color:var(--txf);font-size:12px">ver →</span>
+        </div>`;
+      }).join('')
+    : '<div class="empty"><div class="empty-ic">✅</div><div class="empty-tx">Nenhum risco alto</div></div>';
+
+  // Heatmap
+  const areas = [...new Set(cs.map(c=>c.area))];
+  let hHtml = `<table><thead><tr><th>Fator</th>${areas.map(a=>`<th>${a}</th>`).join('')}</tr></thead><tbody>`;
+  NR1_FATORES.forEach(f => {
+    hHtml += `<tr><td>${NR1_LABELS[f]}</td>`;
+    areas.forEach(ar => {
+      const arCks = cks.filter(ck => { const c=cs.find(x=>x.id===ck.colaborador_id); return c&&c.area===ar; });
+      const hC = arCks.filter(c=>(c['nr1_'+f]||'baixo')==='alto').length;
+      const mC = arCks.filter(c=>(c['nr1_'+f]||'baixo')==='medio').length;
+      const r  = hC>0?'alto':mC>0?'medio':'baixo';
+      hHtml += `<td><span class="rp ${r==='alto'?'rh':r==='medio'?'rm':'rl'}">${r}</span></td>`;
+    });
+    hHtml += '</tr>';
+  });
+  document.getElementById('heatBlock').innerHTML = hHtml + '</tbody></table>';
+
+  // Factor chart
+  const CC = { dg:'#E85C4A', wn:'#F5A623', mn:'#91D9A3' };
+  const go = { color:'rgba(5,65,89,0.06)' };
+  nr1Charts.factor = new Chart(document.getElementById('nr1Chart'), {
+    type:'bar',
+    data:{
+      labels: NR1_FATORES.map(f => NR1_LABELS[f]),
+      datasets:[
+        {label:'Alto', data:NR1_FATORES.map(f=>cks.filter(c=>(c['nr1_'+f]||'baixo')==='alto').length),  backgroundColor:CC.dg, borderRadius:3},
+        {label:'Médio',data:NR1_FATORES.map(f=>cks.filter(c=>(c['nr1_'+f]||'baixo')==='medio').length), backgroundColor:CC.wn, borderRadius:3},
+        {label:'Baixo',data:NR1_FATORES.map(f=>cks.filter(c=>(c['nr1_'+f]||'baixo')==='baixo').length), backgroundColor:CC.mn, borderRadius:3},
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:true,
+      plugins:{legend:{display:true,labels:{font:{size:9},boxWidth:10}}},
+      scales:{x:{stacked:true,grid:{color:go.color},ticks:{font:{size:8},color:'#7fa4b4'}},y:{stacked:true,grid:{color:go.color},ticks:{font:{size:9},color:'#7fa4b4'}}}
+    }
+  });
+}
+
+// ════════════════════════════════════════════════════════════════
+//  EXPORT
+// ════════════════════════════════════════════════════════════════
+function exportCSV(type) {
+  const cks = CHECKINS, cs = COLABORADORES, gs = GESTORES;
+  let headers = [], rows = [];
+
+  if (type === 'bruto') {
+    headers = ['Nome','Cargo','Área','Gestor','Admissão','Data Checkin','Score Geral','NPS',
+               'Onboarding','Integração','Demandas','Treinamento','Ferramentas','Liderança','Bem-estar','Pertencimento','Cultura',
+               'NR1-Sobrecarga','NR1-Suporte','NR1-Conflitos','NR1-Pressão','NR1-Clareza','NR1-Isolamento','NR1-Seg.Psico'];
+    rows = cks.map(ck => {
+      const c = cs.find(x=>x.id===ck.colaborador_id)||{};
+      const g = gs.find(x=>x.id===c.gestor_id)||{};
+      return [c.nome,c.cargo,c.area,g.nome,c.admissao,ck.data,scoreGeral(ck).toFixed(1),ck.nps,
+              ck.score_onb,ck.score_integ,ck.score_dem,ck.score_trei,ck.score_tools,ck.score_lider,ck.score_bem,ck.score_pert,ck.score_cult,
+              ...NR1_FATORES.map(f=>ck['nr1_'+f]||'baixo')];
+    });
+  } else if (type === 'indicadores') {
+    headers = ['Indicador','Valor'];
+    const ps=cks.filter(c=>c.nps>=9).length, ds=cks.filter(c=>c.nps<=6).length;
+    rows = [
+      ['Total checkins', cks.length],
+      ['NPS', cks.length ? Math.round(ps/cks.length*100-ds/cks.length*100) : '—'],
+      ['Promotores %', cks.length ? Math.round(ps/cks.length*100) : '—'],
+      ['Detratores %', cks.length ? Math.round(ds/cks.length*100) : '—'],
+      ['Score médio geral', cks.length ? avg(cks.map(c=>scoreGeral(c))).toFixed(2) : '—'],
+      ['Bem-estar médio', cks.length ? avg(cks.map(c=>c.score_bem||0)).toFixed(2) : '—'],
+      ['Riscos altos NR-1', cks.filter(c=>nr1Risk(c)==='alto').length],
+      ['Colaboradores ativos', cs.filter(c=>c.status==='ativo').length],
+    ];
+  } else {
+    headers = ['Nome','Cargo','Área','Data',...NR1_FATORES.map(f=>NR1_LABELS[f]),'Risco Geral'];
+    rows = cks.map(ck => {
+      const c = cs.find(x=>x.id===ck.colaborador_id)||{};
+      return [c.nome,c.cargo,c.area,ck.data,...NR1_FATORES.map(f=>ck['nr1_'+f]||'baixo'),nr1Risk(ck)];
+    });
+  }
+
+  const csv = [headers,...rows].map(r=>r.map(x=>`"${String(x||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  a.download = `joinin-${type}-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  toast('Download iniciado ✓','ok');
+}
+
+// ════════════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════════════
+function scoreGeral(ck) {
+  const vals = [ck.score_onb,ck.score_integ,ck.score_dem,ck.score_trei,ck.score_tools,ck.score_lider,ck.score_bem,ck.score_pert,ck.score_cult].filter(v=>v!=null);
+  return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+}
+function scoreColor(s) { return s>=8?'var(--mnm)':s>=7?'var(--tlm)':s>=6?'var(--wnm)':'var(--dgm)'; }
+function avg(arr) { const f=arr.filter(x=>x!=null&&!isNaN(x)); return f.length?f.reduce((a,b)=>a+b,0)/f.length:0; }
+function nr1Risk(ck) {
+  const vals = NR1_FATORES.map(f => ck['nr1_'+f] || 'baixo');
+  if (vals.includes('alto'))  return 'alto';
+  if (vals.includes('medio')) return 'medio';
+  return 'baixo';
+}
+function initials(n) { if(!n)return'?'; const p=n.trim().split(' '); return p.length>=2?(p[0][0]+p[p.length-1][0]).toUpperCase():n.slice(0,2).toUpperCase(); }
+const AVT_COLORS = ['#054159','#04BFAD','#038C8C','#91D9A3','#7F77DD','#534AB7','#F5A623','#E85C4A','#4aad6a'];
+function avatarColor(id) { let h=0; for(const c of id||'') h=(h*31+c.charCodeAt(0))%AVT_COLORS.length; return AVT_COLORS[h]; }
+function fmtDate(d) { if(!d)return'—'; return new Date(d+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit',year:'2-digit'}); }
+function daysAgo(d) { return Math.floor((Date.now()-new Date(d))/86400000); }
+function v(id) { return document.getElementById(id)?.value || ''; }
+
+function refreshFilters() {
+  const areas = [...new Set(COLABORADORES.map(c=>c.area))];
+  ['fArea','hArea','expArea'].forEach(id => {
+    const el = document.getElementById(id); if(!el) return;
+    const first = el.options[0].cloneNode(true);
+    el.innerHTML = ''; el.add(first);
+    areas.forEach(a => { const o=document.createElement('option'); o.value=a; o.textContent=a; el.add(o); });
+  });
+  ['fGestor','expGestor'].forEach(id => {
+    const el = document.getElementById(id); if(!el) return;
+    const first = el.options[0]?.cloneNode(true) || (() => { const o=document.createElement('option'); o.value=''; o.textContent='Todos os gestores'; return o; })();
+    el.innerHTML = ''; el.add(first);
+    GESTORES.forEach(g => { const o=document.createElement('option'); o.value=g.id; o.textContent=g.nome; el.add(o); });
+  });
+}
+
+function updateAlertBadge() {
+  const h = CHECKINS.filter(c=>nr1Risk(c)==='alto').length;
+  const bd = document.getElementById('alertBadge');
+  bd.textContent = h;
+  bd.style.display = h > 0 ? '' : 'none';
+}
+
+function destroyAllCharts() {
+  Object.values(dashCharts).forEach(c => c && c.destroy());
+  dashCharts = {};
+}
+
+function toast(msg, type='ok') {
+  const w = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `${type==='ok'?'✓':type==='er'?'✕':'ℹ'} ${msg}`;
+  w.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  INIT — verificar token existente
+// ════════════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('topDate').textContent = new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+
+  if (TOKEN) {
+    try {
+      const res = await api('auth', 'POST', { action: 'me' });
+      USER = res.user;
+      enterApp();
+    } catch(e) {
+      TOKEN = '';
+      localStorage.removeItem('ji_token');
+    }
+  }
+});
+</script>
+</body>
+</html>
 
