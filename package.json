@@ -1,0 +1,8 @@
+{
+  "name": "joinin-people-intelligence",
+  "version": "1.0.0",
+  "description": "JoinIn · People Intelligence Platform",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}
